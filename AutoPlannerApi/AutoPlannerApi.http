@@ -1,0 +1,6 @@
+@AutoPlannerApi_HostAddress = http://localhost:5244
+
+GET {{AutoPlannerApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

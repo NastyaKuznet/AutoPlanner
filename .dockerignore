@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.user
+**/*.csproj.user
+**/nuget.config
+**/.vs/
+**/packages/
+.Dockerfile
+.git/
+.gitignore
+README.md
