@@ -24,47 +24,52 @@ namespace AutoPlannerApi.Data.TaskData.Realization
                 await connection.OpenAsync();
 
                 var sql = @"
-                    INSERT INTO tasks (
-                        user_id, name, description, created_date, priority, start_date_time, 
-                        end_date_time, duration, is_repit, repit_time, is_repit_from_start, 
-                        count_repit, start_date_time_repit, end_date_time_repit, rule_one_task,
-                        start_date_time_rule_one_task, end_date_time_rule_one_task, rule_two_task,
-                        time_position_regarding_task_id, second_task_id, relation_range_id,
-                        date_time_range, is_complete, complete_date_time
-                    ) VALUES (
-                        @userId, @name, @description, @createdDate, @priority, @startDateTime,
-                        @endDateTime, @duration, @isRepit, @repitTime, @isRepitFromStart,
-                        @countRepit, @startDateTimeRepit, @endDateTimeRepit, @ruleOneTask,
-                        @startDateTimeRuleOneTask, @endDateTimeRuleOneTask, @ruleTwoTask,
-                        @timePositionRegardingTaskId, @secondTaskId, @relationRangeId,
-                        @dateTimeRange, @isComplete, @completeDateTime
-                    ) RETURNING id";
+                INSERT INTO tasks (
+                    user_id, name, description, created_date, priority, start_date_time, 
+                    end_date_time, duration, is_repit, repit_time, is_repit_from_start, 
+                    count_repit, start_date_time_repit, end_date_time_repit, rule_one_task,
+                    start_date_time_rule_one_task, end_date_time_rule_one_task, rule_two_task,
+                    time_position_regarding_task_id, second_task_id, relation_range_id,
+                    date_time_range, is_complete, complete_date_time
+                ) VALUES (
+                    @userId, @name, @description, @createdDate, @priority, @startDateTime,
+                    @endDateTime, @duration, @isRepit, @repitTime, @isRepitFromStart,
+                    @countRepit, @startDateTimeRepit, @endDateTimeRepit, @ruleOneTask,
+                    @startDateTimeRuleOneTask, @endDateTimeRuleOneTask, @ruleTwoTask,
+                    @timePositionRegardingTaskId, @secondTaskId, @relationRangeId,
+                    @dateTimeRange, @isComplete, @completeDateTime
+                ) RETURNING id";
 
                 using var command = new NpgsqlCommand(sql, connection);
 
+
                 command.Parameters.AddWithValue("userId", userId);
-                command.Parameters.AddWithValue("name", taskForAdd.Name);
+                command.Parameters.AddWithValue("name", taskForAdd.Name ?? "");
                 command.Parameters.AddWithValue("description", taskForAdd.Description ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("createdDate", taskForAdd.CreatedDate);
                 command.Parameters.AddWithValue("priority", taskForAdd.Priority);
+                command.Parameters.AddWithValue("isRepit", taskForAdd.IsRepit);
+                command.Parameters.AddWithValue("isRepitFromStart", taskForAdd.IsRepitFromStart);
+                command.Parameters.AddWithValue("countRepit", taskForAdd.CountRepit);
+                command.Parameters.AddWithValue("ruleOneTask", taskForAdd.RuleOneTask);
+                command.Parameters.AddWithValue("ruleTwoTask", taskForAdd.RuleTwoTask);
+                command.Parameters.AddWithValue("timePositionRegardingTaskId", taskForAdd.TimePositionRegardingTaskId);
+                command.Parameters.AddWithValue("relationRangeId", taskForAdd.RelationRangeId);
+                command.Parameters.AddWithValue("isComplete", taskForAdd.IsComplete);
+
                 command.Parameters.AddWithValue("startDateTime", taskForAdd.StartDateTime ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("endDateTime", taskForAdd.EndDateTime ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("duration", taskForAdd.Duration ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("isRepit", taskForAdd.IsRepit);
                 command.Parameters.AddWithValue("repitTime", taskForAdd.RepitTime ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("isRepitFromStart", taskForAdd.IsRepitFromStart);
-                command.Parameters.AddWithValue("countRepit", taskForAdd.CountRepit);
                 command.Parameters.AddWithValue("startDateTimeRepit", taskForAdd.StartDateTimeRepit ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("endDateTimeRepit", taskForAdd.EndDateTimeRepit ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("ruleOneTask", taskForAdd.RuleOneTask);
                 command.Parameters.AddWithValue("startDateTimeRuleOneTask", taskForAdd.StartDateTimeRuleOneTask ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("endDateTimeRuleOneTask", taskForAdd.EndDateTimeRuleOneTask ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("ruleTwoTask", taskForAdd.RuleTwoTask);
-                command.Parameters.AddWithValue("timePositionRegardingTaskId", taskForAdd.TimePositionRegardingTaskId);
-                command.Parameters.AddWithValue("secondTaskId", taskForAdd.SecondTaskId);
-                command.Parameters.AddWithValue("relationRangeId", taskForAdd.RelationRangeId);
+
+                var secondTaskIdValue = taskForAdd.SecondTaskId == 0 ? (object)DBNull.Value : taskForAdd.SecondTaskId;
+                command.Parameters.AddWithValue("secondTaskId", secondTaskIdValue);
+
                 command.Parameters.AddWithValue("dateTimeRange", taskForAdd.DateTimeRange ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("isComplete", taskForAdd.IsComplete);
                 command.Parameters.AddWithValue("completeDateTime", taskForAdd.CompleteDateTime ?? (object)DBNull.Value);
 
                 var newId = await command.ExecuteScalarAsync();
@@ -73,7 +78,6 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding task: {ex.Message}");
                 return new AddTaskAnswerStatusData { Status = AddTaskAnswerStatusData.Bad };
             }
         }
@@ -243,7 +247,7 @@ namespace AutoPlannerApi.Data.TaskData.Realization
                         reader.IsDBNull(endDateTimeRuleOneTaskIndex) ? null : reader.GetDateTime(endDateTimeRuleOneTaskIndex),
                         reader.GetBoolean(ruleTwoTaskIndex),
                         reader.GetInt32(timePositionRegardingTaskIdIndex),
-                        reader.GetInt32(secondTaskIdIndex),
+                        reader.IsDBNull(secondTaskIdIndex) ? 0 : reader.GetInt32(secondTaskIdIndex),
                         reader.GetInt32(relationRangeIdIndex),
                         reader.IsDBNull(dateTimeRangeIndex) ? null : reader.GetTimeSpan(dateTimeRangeIndex),
                         reader.GetBoolean(isCompleteIndex),

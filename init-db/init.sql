@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     end_date_time_rule_one_task TIMESTAMP,
     rule_two_task BOOLEAN DEFAULT FALSE,
     time_position_regarding_task_id INTEGER DEFAULT 0,
-    second_task_id INTEGER REFERENCES tasks(id),
+    second_task_id INTEGER REFERENCES tasks(id) NULL,
     relation_range_id INTEGER DEFAULT 0,
     date_time_range INTERVAL,
     is_complete BOOLEAN DEFAULT FALSE,
