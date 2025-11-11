@@ -122,6 +122,18 @@ namespace AutoPlannerApi.Data.TaskData.Realization
                 userTasks));
         }
 
+        public Task<TaskDatabase> GetById(int id)
+        {
+            foreach (var task in _tasks)
+            {
+                if (task.Id == id)
+                {
+                    return Task.FromResult(task);
+                }
+            }
+            return Task.FromResult(new TaskDatabase());
+        }
+
         public Task<SetCompleteAnswerStatusDatabase> SetComplete(int taskId)
         {
             var flag = false;

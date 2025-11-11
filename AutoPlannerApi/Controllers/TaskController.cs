@@ -148,5 +148,31 @@ namespace AutoPlannerApi.Controllers
             }
             return StatusCode(StatusCodes.Status500InternalServerError, "Unknow error.");
         }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> Get([FromRoute] int userId)
+        {
+            var status = await _taskService.Get(userId);
+            if (status.Status.Status == GetByUserIdAnswerStatusDomain.Good)
+            {
+                return Ok(status.Tasks);
+            }
+            if (status.Status.Status == GetByUserIdAnswerStatusDomain.UserNotExist)
+            {
+                return BadRequest("user with id not found.");
+            }
+            if (status.Status.Status == GetByUserIdAnswerStatusDomain.Bad)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Tasks didn`t have.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unknow error.");
+        }
+
+        [HttpGet("/id/{taskId}")]
+        public async Task<IActionResult> GetById([FromRoute] int taskId)
+        {
+            var status = await _taskService.GetById(taskId);
+            return Ok(status);
+        }
     }
 }

@@ -60,14 +60,21 @@ namespace AutoPlannerCore.Test.PlannerTest
                 StartDateTime = new DateTime(2025, 9, 18, 8, 30, 0),
                 EndDateTime = new DateTime(2025, 9, 18, 8, 40, 0),
             };
+            var task2 = new PlanningTask()
+            {
+                MyTaskId = 2,
+                Name = "Сходить в прачку",
+                StartDateTime = new DateTime(2025, 9, 18, 8, 30, 0),
+                EndDateTime = new DateTime(2025, 9, 18, 8, 40, 0),
+            };
             var table = new TimeTable();
 
             var planner = new Planner(new PreparingTaskForPlanner(new DateTime(2025, 9, 17), new DateTime(2025, 9, 19)));
-            planner.PrimaryCheck(new List<PlanningTask>() { task, task }, table, new List<PlanningTask>() { task, task });
+            planner.PrimaryCheck(new List<PlanningTask>() { task, task2 }, table, new List<PlanningTask>() { task, task2 });
 
             var expectedPenaltyTask = new List<PlanningTask>() { new PlanningTask()
             {
-                MyTaskId = task.MyTaskId,
+                MyTaskId = task2.MyTaskId,
                 Name = task.Name,
                 StartDateTime = task.StartDateTime,
                 EndDateTime = task.EndDateTime,

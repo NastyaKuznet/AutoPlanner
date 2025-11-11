@@ -63,6 +63,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     timeTableItemDatabase.UserId,
                     timeTableItemDatabase.CountFrom,
                     timeTableItemDatabase.Name,
+                    timeTableItemDatabase.Priority,
                     timeTableItemDatabase.StartDateTime,
                     timeTableItemDatabase.EndDateTime,
                     timeTableItemDatabase.IsComplete,
@@ -164,6 +165,10 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
             }
             foreach (var t in secondTaskNeed)
             {
+                if(tasks.Count(x => x.Id == t.SecondTaskId) == 0)
+                {
+                    continue;
+                }
                 tasks.Add(new MyTask()
                 {
                     Id = t.Id,
@@ -217,7 +222,6 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
             }
             var table = new TimeTable() 
             {
-                 TimeTableItems = timeTableItems,
             };
 
             var planner = new Planner(new PreparingTaskForPlanner(startTimeTable, endDateTime));
@@ -240,6 +244,10 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         new List<PlanningTaskDomain>());
                 }
             }
+            foreach (var forDelete in alreadyExistInDatabase.TimeTableItems)
+            {
+                await _timeTableDatabaseRepository.Delete(forDelete.MyTaskId);
+            }
             foreach (var afterTimeTableItems in table.TimeTableItems) 
             {
                 afterTTI.Add(new TimeTableItemDomain(
@@ -247,21 +255,19 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     userId,
                     afterTimeTableItems.CountFrom,
                     afterTimeTableItems.Name,
+                    afterTimeTableItems.Priority,
                     afterTimeTableItems.StartDateTime,
                     afterTimeTableItems.EndDateTime,
                     afterTimeTableItems.IsComplete,
                     afterTimeTableItems.CompleteDateTime));
 
-                if (alreadyExistInDatabase.TimeTableItems.Count(x => x.MyTaskId == afterTimeTableItems.MyTaskId) > 0)
-                {
-                    continue;
-                }
                 var state = await _timeTableDatabaseRepository.Add(
                     new TimeTableItemForAddDatabase(
                         afterTimeTableItems.MyTaskId,
                         userId,
                         afterTimeTableItems.CountFrom,
                         afterTimeTableItems.Name,
+                        afterTimeTableItems.Priority,
                         afterTimeTableItems.StartDateTime,
                         afterTimeTableItems.EndDateTime,
                         afterTimeTableItems.IsComplete,

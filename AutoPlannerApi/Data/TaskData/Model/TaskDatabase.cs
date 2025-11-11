@@ -165,5 +165,7 @@
             IsComplete = isComplete;
             CompleteDateTime = completeDateTime;
         }
+
+        public TaskDatabase() { }
     }
 }
