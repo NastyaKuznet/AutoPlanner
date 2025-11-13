@@ -1,6 +1,6 @@
-﻿namespace AutoPlannerApi.Domain.TimeTableDomain.Model
+﻿namespace AutoPlannerApi.Data.PlanningTaskData.Model
 {
-    public class PlanningTaskDomain
+    public class PlanningTaskDatabase
     {
         public int UserId { get; set; }
         /// <summary>
@@ -101,7 +101,7 @@
         /// </summary>
         public TimeSpan? DateTimeRange { get; }
 
-        public PlanningTaskDomain(
+        public PlanningTaskDatabase(
             int userId,
             int myTaskId,
             string name,
