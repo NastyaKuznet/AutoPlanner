@@ -1,10 +1,13 @@
 ﻿using AutoPlannerApi.Data.Common.Model;
+using AutoPlannerApi.Data.PlanningTaskData.Interface;
+using AutoPlannerApi.Data.PlanningTaskData.Model.Answer.AnswerStatus;
 using AutoPlannerApi.Data.TimeTableData.Interface;
 using AutoPlannerApi.Data.TimeTableData.Model;
 using AutoPlannerApi.Data.TimeTableData.Model.Answer;
 using AutoPlannerApi.Data.TimeTableData.Model.Answer.AnswerStatus;
 using AutoPlannerApi.Domain.TaskDomain.Interface;
 using AutoPlannerApi.Domain.TaskDomain.Model;
+using AutoPlannerApi.Domain.TaskDomain.Model.AnswerStatus;
 using AutoPlannerApi.Domain.TimeTableDomain.Interface;
 using AutoPlannerApi.Domain.TimeTableDomain.Model;
 using AutoPlannerApi.Domain.TimeTableDomain.Model.Answer;
@@ -22,18 +25,21 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
         private ITimeTableItemDatabaseRepository _timeTableDatabaseRepository;
         private IUserService _userService;
         private ITaskService _taskService;
+        private IPlanningTaskDatabaseRepository _planningTaskDatabaseRepository;
         
         public TimeTableItemClassicService(
             ITimeTableItemDatabaseRepository timeTableDatabaseRepository,
             IUserService userService,
-            ITaskService taskService)
+            ITaskService taskService, 
+            IPlanningTaskDatabaseRepository planningTaskDatabaseRepository)
         {
             _timeTableDatabaseRepository = timeTableDatabaseRepository;
             _userService = userService;
             _taskService = taskService;
+            _planningTaskDatabaseRepository = planningTaskDatabaseRepository;
         }
 
-        public async Task<(GetTTByUserIdAnswerStatusDomain, List<TimeTableItemDomain>)> Get(int userId)
+        public async Task<(GetTTByUserIdAnswerStatusDomain, List<TimeTableItemDomain>, List<PlanningTaskDomain>)> Get(int userId)
         {
             var userExist = await _userService.Check(userId);
             if (userExist.Status == CheckAnswerStatusDomain.UserNotExists)
@@ -43,7 +49,8 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     {
                         Status = GetTTByUserIdAnswerStatusDomain.UserNotExist
                     }, 
-                    new List<TimeTableItemDomain>());
+                    new List<TimeTableItemDomain>(),
+                    new List<PlanningTaskDomain>());
             }
             var timeTableItemsAnswer = await _timeTableDatabaseRepository.Get(userId);
             if (timeTableItemsAnswer.Status.Status == ClassicAnswerStatus.Bad)
@@ -53,7 +60,8 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     {
                         Status = GetTTByUserIdAnswerStatusDomain.Bad
                     },
-                    new List<TimeTableItemDomain>());
+                    new List<TimeTableItemDomain>(),
+                    new List<PlanningTaskDomain>());
             }
             var timeTableItemsDomain = new List<TimeTableItemDomain>();
             foreach(var timeTableItemDatabase in timeTableItemsAnswer.TimeTableItems)
@@ -69,12 +77,50 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     timeTableItemDatabase.IsComplete,
                     timeTableItemDatabase.CompleteDateTime));
             }
+            var allPlanningTasksAnswer = await _planningTaskDatabaseRepository.Get(userId);
+            if (allPlanningTasksAnswer.Status.Status == GetPlanningTasksByUserIdDatabaseAnswerStatus.Bad)
+            {
+                return (
+                    new GetTTByUserIdAnswerStatusDomain()
+                    {
+                        Status = GetTTByUserIdAnswerStatusDomain.Bad
+                    },
+                    new List<TimeTableItemDomain>(),
+                    new List<PlanningTaskDomain>());
+            }
+            var penaltyTasksDomain = new List<PlanningTaskDomain>();
+            foreach (var task in allPlanningTasksAnswer.PlanningTasks)
+            {
+                penaltyTasksDomain.Add(new PlanningTaskDomain(
+                    task.UserId,
+                    task.MyTaskId,
+                    task.Name,
+                    task.Description,
+                    task.Priority,
+                    task.StartDateTime,
+                    task.EndDateTime,
+                    task.Duration,
+                    task.CountFrom,
+                    task.IsComplete,
+                    task.CompleteDateTime,
+                    task.StartDateTimeRange,
+                    task.EndDateTimeRange,
+                    task.RuleOneTask,
+                    task.StartDateTimeRuleOneTask,
+                    task.EndDateTimeRuleOneTask,
+                    task.RuleTwoTask,
+                    task.TimePositionRegardingTaskId,
+                    task.SecondTaskId,
+                    task.RelationRangeId,
+                    task.DateTimeRange));
+            }
             return (
                 new GetTTByUserIdAnswerStatusDomain()
                 { 
                     Status = GetTTByUserIdAnswerStatusDomain.Good
                 },
-                timeTableItemsDomain);
+                timeTableItemsDomain,
+                penaltyTasksDomain);
         }
 
         public async Task<RecreateTimeTableAnswerDomain> Recreate(int userId, DateTime startTimeTable, DateTime endDateTime)
@@ -278,10 +324,55 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                 }
             }
 
+
+            var resultDelete = await _planningTaskDatabaseRepository.DeleteByUserId(userId);
+            if (resultDelete.Status.Status == DeletePlanningTaskDatabaseAnswerStatus.Bad)
+            {
+                return new RecreateTimeTableAnswerDomain(
+                new RecreateTimeTableAnswerStatusDomain()
+                {
+                    Status = RecreateTimeTableAnswerStatusDomain.Bad,
+                },
+                new List<TimeTableItemDomain>(),
+                new List<PlanningTaskDomain>());
+            }
             var afterPenaltyTasks = new List<PlanningTaskDomain>();
             foreach (var aftPenTask in planner.PenaltyTask)
             {
+                var result = await _planningTaskDatabaseRepository.Add(new Data.PlanningTaskData.Model.PlanningTaskDatabase(
+                    userId,
+                    aftPenTask.MyTaskId,
+                    aftPenTask.Name,
+                    aftPenTask.Description,
+                    aftPenTask.Priority,
+                    aftPenTask.StartDateTime,
+                    aftPenTask.EndDateTime,
+                    aftPenTask.Duration,
+                    aftPenTask.CountFrom,
+                    aftPenTask.IsComplete,
+                    aftPenTask.CompleteDateTime,
+                    aftPenTask.StartDateTimeRange,
+                    aftPenTask.EndDateTimeRange,
+                    aftPenTask.RuleOneTask is not null,
+                    aftPenTask.RuleOneTask is not null ? aftPenTask.RuleOneTask.StartDateTime : null,
+                    aftPenTask.RuleOneTask is not null ? aftPenTask.RuleOneTask.EndDateTime : null,
+                    aftPenTask.RuleTwoTask is not null,
+                    aftPenTask.RuleTwoTask is not null ? (int)aftPenTask.RuleTwoTask.TimePositionRegardingTask : 0,
+                    aftPenTask.RuleTwoTask is not null ? aftPenTask.RuleTwoTask.SecondTask.Id : 0,
+                    aftPenTask.RuleTwoTask is not null ? (int)aftPenTask.RuleTwoTask.RelationRange : 0,
+                    aftPenTask.RuleTwoTask is not null ? aftPenTask.RuleTwoTask.DateTimeRange : null));
+                if (result.Status.Status == AddPlanningTaskDatabaseAnswerStatus.Bad)
+                {
+                    return new RecreateTimeTableAnswerDomain(
+                    new RecreateTimeTableAnswerStatusDomain()
+                    {
+                        Status = RecreateTimeTableAnswerStatusDomain.Bad,
+                    },
+                    new List<TimeTableItemDomain>(),
+                    new List<PlanningTaskDomain>());
+                }
                 afterPenaltyTasks.Add(new PlanningTaskDomain(
+                    userId,
                     aftPenTask.MyTaskId,
                     aftPenTask.Name,
                     aftPenTask.Description,

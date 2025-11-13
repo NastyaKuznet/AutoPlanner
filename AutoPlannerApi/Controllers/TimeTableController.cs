@@ -30,7 +30,7 @@ namespace AutoPlannerApi.Controllers
             }
             if (result.Item1.Status == GetTTByUserIdAnswerStatusDomain.Good)
             {
-                return Ok(result.Item2);
+                return Ok(new RecreateTimeTableAnswer(result.Item2, result.Item3));
             }
             return StatusCode(StatusCodes.Status500InternalServerError, "Unknow error.");
         }
