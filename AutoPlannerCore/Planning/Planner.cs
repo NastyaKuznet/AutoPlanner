@@ -372,7 +372,10 @@ namespace AutoPlannerCore.Planning
         {
             foreach (var item in table.TimeTableItems)
             {
-                return !(task.StartDateTime < item.EndDateTime && task.EndDateTime > item.StartDateTime);
+                if (task.StartDateTime < item.EndDateTime && task.EndDateTime > item.StartDateTime)
+                {
+                    return false;
+                }
             }
             return true;
         }
