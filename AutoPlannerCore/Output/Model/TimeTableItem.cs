@@ -22,6 +22,9 @@ namespace AutoPlannerCore.Output.Model
         /// </summary>
         public string Name { get; set; }
 
+        /// <inheritdoc/>
+        public int Priority { get; set; } = 0;
+
         /// <summary>
         /// Дата и время начала задачи в расписании.
         /// </summary>
@@ -53,6 +56,7 @@ namespace AutoPlannerCore.Output.Model
 
             return MyTaskId == other.MyTaskId &&
                    string.Equals(Name, other.Name, StringComparison.Ordinal) &&
+                   Priority == other.Priority &&
                    StartDateTime == other.StartDateTime &&
                    EndDateTime == other.EndDateTime &&
                    IsComplete == other.IsComplete &&
@@ -61,7 +65,7 @@ namespace AutoPlannerCore.Output.Model
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(MyTaskId, Name, StartDateTime, EndDateTime, IsComplete, CompleteDateTime);
+            return HashCode.Combine(MyTaskId, Name, Priority, StartDateTime, EndDateTime, IsComplete, CompleteDateTime);
         }
     }
 }

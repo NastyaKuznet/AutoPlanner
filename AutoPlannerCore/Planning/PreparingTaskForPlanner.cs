@@ -32,6 +32,16 @@ namespace AutoPlannerCore.Planning
             {
                 if (task.IsRepit)
                 {
+                    if (task.StartDateTimeRepit == null)
+                    {
+                        task.StartDateTimeRepit = task.StartDateTime;
+                        task.EndDateTimeRepit = task.StartDateTime + (task.Duration + task.RepitDateTime) * (task.CountRepit - 1) + task.Duration;
+                    }
+                    if (task.StartDateTimeRepit != null && task.CountRepit == 0)
+                    {
+                        var a = ((DateTime)task.EndDateTimeRepit - (TimeSpan)task.Duration - (DateTime)task.StartDateTimeRepit) / ((TimeSpan)task.Duration + (TimeSpan)task.RepitDateTime) + 1;
+                        task.CountRepit = (int)Math.Round(a);
+                    }
                     if (task.StartDateTimeRepit <= _tableEndDate && task.EndDateTimeRepit >= _tableStartDate)
                     {
                         var repitTasks = RepitTaskParser.Parse(task);

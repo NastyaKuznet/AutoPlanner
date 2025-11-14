@@ -10,6 +10,8 @@ using AutoPlannerApi.Domain.TimeTableDomain.Interface;
 using AutoPlannerApi.Domain.TimeTableDomain.Realization;
 using AutoPlannerApi.Data.TimeTableData.Interface;
 using AutoPlannerApi.Data.TimeTableData.Realization;
+using AutoPlannerApi.Data.PlanningTaskData.Interface;
+using AutoPlannerApi.Data.PlanningTaskData.Realization;
 
 var builder = WebApplication.CreateBuilder(args);
 

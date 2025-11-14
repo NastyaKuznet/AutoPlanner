@@ -10,6 +10,8 @@ namespace AutoPlannerApi.Data.TaskData.Interface
 
         public Task<GetByUserIdAnswerData> Get(int userId);
 
+        public Task<TaskDatabase> GetById(int id);
+
         public Task<TaskForEditAnswerStatusData> Edit(TaskForEditDatabase taskForEdit);
 
         public Task<DeleteTaskAnswerStatusDatabase> Delete(int taskId);

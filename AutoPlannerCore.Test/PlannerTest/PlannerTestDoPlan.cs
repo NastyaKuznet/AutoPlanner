@@ -251,5 +251,89 @@ namespace AutoPlannerCore.Test.PlannerTest
             };
             Assert.IsTrue(expectedTimeTable.Equals(table));
         }
+
+        [TestMethod]
+        public void DoPlanRepit()
+        {
+            var task1 = new MyTask()
+            {
+                Id = 1,
+                Name = "Сходить в прачку",
+                StartDateTime = new DateTime(2025, 09, 27, 13, 00, 00),
+                EndDateTime = new DateTime(2025, 09, 27, 13, 10, 00),
+                IsRepit = true,
+                CountRepit = 2,
+                RepitDateTime = new TimeSpan(00, 30, 00),
+                StartDateTimeRepit = new DateTime(2025, 09, 27, 13, 00, 00),
+                EndDateTimeRepit = new DateTime(2025, 09, 27, 13, 50, 00),
+            };
+            var table = new TimeTable();
+
+            var planner = new Planner(new PreparingTaskForPlanner(new DateTime(2025, 09, 26), new DateTime(2025, 09, 30)));
+            planner.DoPlan(new List<MyTask>() { task1 }, table);
+
+            var expectedTimeTable = new TimeTable()
+            {
+                TimeTableItems = new List<TimeTableItem>()
+                {
+                    new TimeTableItem()
+                    {
+                        MyTaskId = task1.Id,
+                        Name = task1.Name,
+                        CountFrom = 1,
+                        StartDateTime = new DateTime(2025, 09, 27, 13, 00, 00),
+                        EndDateTime = new DateTime(2025, 09, 27, 13, 10, 00)
+                    },
+                    new TimeTableItem()
+                    {
+                        MyTaskId = task1.Id,
+                        Name = task1.Name,
+                        CountFrom = 2,
+                        StartDateTime = new DateTime(2025, 09, 27, 13, 40, 0),
+                        EndDateTime = new DateTime(2025, 09, 27, 13, 50, 0)
+                    },
+                }
+            };
+            Assert.IsTrue(expectedTimeTable.Equals(table));
+        }
+
+        [TestMethod]
+        public void DoPlanStart()
+        {
+            var task1 = new MyTask()
+            {
+                Id = 1,
+                Name = "Сходить в прачку",
+                StartDateTime = new DateTime(2025, 09, 27, 13, 00, 00),
+                EndDateTime = new DateTime(2025, 09, 27, 14, 10, 00),
+            };
+            var task2 = new MyTask()
+            {
+                Id = 2,
+                Name = "Сходить в прачку",
+                StartDateTime = new DateTime(2025, 09, 27, 13, 10, 00),
+                EndDateTime = new DateTime(2025, 09, 27, 14, 10, 00),
+            };
+            var table = new TimeTable();
+
+            var planner = new Planner(new PreparingTaskForPlanner(new DateTime(2025, 09, 26), new DateTime(2025, 09, 30)));
+            planner.DoPlan(new List<MyTask>() { task1, task2 }, table);
+
+            var expectedTimeTable = new TimeTable()
+            {
+                TimeTableItems = new List<TimeTableItem>()
+                {
+                    new TimeTableItem()
+                    {
+                        MyTaskId = task1.Id,
+                        Name = task1.Name,
+                        CountFrom = 1,
+                        StartDateTime = new DateTime(2025, 09, 27, 13, 00, 00),
+                        EndDateTime = new DateTime(2025, 09, 27, 14, 10, 00)
+                    },
+                }
+            };
+            Assert.IsTrue(expectedTimeTable.Equals(table));
+        }
     }
 }

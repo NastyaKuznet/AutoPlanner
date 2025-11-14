@@ -56,7 +56,7 @@ namespace AutoPlannerCore.Planning
         {
             foreach(var task in planningTasks)
             {
-                if (table.TimeTableItems.Count(x => x.MyTaskId == task.MyTaskId) != 0)
+                if (table.TimeTableItems.Count(x => x.MyTaskId == task.MyTaskId && x.CountFrom == task.CountFrom) != 0)
                 {
                     continue;
                 }
@@ -75,6 +75,7 @@ namespace AutoPlannerCore.Planning
                     if (task.RuleOneTask is not null)
                     {
                         PreparingTaskForPlanner.SetDateTimeRangeFromRuleOneTask(task);
+                        TertiaryQueue.Add(task);
                     }
                     if (task.RuleTwoTask is not null)
                     {
@@ -246,9 +247,26 @@ namespace AutoPlannerCore.Planning
             TimeTable table,
             IReadOnlyCollection<PlanningTask> allPlanningTask)
         {
-            var moveTime = (TimeSpan)baseTask.Duration + (checkStart - moveableTask.StartDateTime);
-            var moveStartTime = (DateTime)(moveableTask.StartDateTime + moveTime);
-            var moveEndTime = (DateTime)(moveStartTime + baseTask.Duration);
+            var moveTime = new TimeSpan();
+            var moveStartTime = new DateTime();
+            var moveEndTime = new DateTime();
+            if (table.TimeTableItems.Count(x => x.MyTaskId == moveableTask.MyTaskId) == 1)
+            {
+                var tti = table.TimeTableItems.First(x => x.MyTaskId == moveableTask.MyTaskId);
+                moveTime = (TimeSpan)baseTask.Duration + (checkStart - tti.StartDateTime);
+                moveStartTime = (DateTime)(tti.StartDateTime + moveTime);
+                moveEndTime = (DateTime)(moveStartTime + baseTask.Duration);
+
+                // костыли мдэ
+                moveableTask.StartDateTimeRange = moveableTask.RuleOneTask.StartDateTime;
+                moveableTask.EndDateTimeRange = moveableTask.RuleOneTask.EndDateTime;
+            }
+            else
+            {
+                moveTime = (TimeSpan)baseTask.Duration + (checkStart - (DateTime)moveableTask.StartDateTime);
+                moveStartTime = (DateTime)(moveableTask.StartDateTime + moveTime);
+                moveEndTime = (DateTime)(moveStartTime + baseTask.Duration);
+            }
             if (CheckEndIsNotEndRange(moveEndTime, moveableTask))
             {
                 PutOutTaskInTimeTable(table, moveableTask);
@@ -292,7 +310,7 @@ namespace AutoPlannerCore.Planning
 
         public static bool CheckTaskIsMoveable(PlanningTask task)
         {
-            return task.StartDateTimeRange is not null;
+            return task.StartDateTimeRange is not null || task.RuleOneTask is not null;
         }
 
         private void PlanningInStartTime(TimeTable table, PlanningTask task, IReadOnlyCollection<PlanningTask> planningTasks)
@@ -354,7 +372,10 @@ namespace AutoPlannerCore.Planning
         {
             foreach (var item in table.TimeTableItems)
             {
-                return !(task.StartDateTime < item.EndDateTime && task.EndDateTime > item.StartDateTime);
+                if (task.StartDateTime < item.EndDateTime && task.EndDateTime > item.StartDateTime)
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -429,6 +450,7 @@ namespace AutoPlannerCore.Planning
                 MyTaskId = task.MyTaskId,
                 CountFrom = task.CountFrom,
                 Name = task.Name,
+                Priority = task.Priority,
                 StartDateTime = (DateTime)task.StartDateTime,
                 EndDateTime = (DateTime)task.EndDateTime,
             };
@@ -463,6 +485,7 @@ namespace AutoPlannerCore.Planning
                 MyTaskId = task.MyTaskId,
                 CountFrom = task.CountFrom,
                 Name = task.Name,
+                Priority = task.Priority,
                 StartDateTime = startDateTime,
                 EndDateTime = endDateTime,
             };

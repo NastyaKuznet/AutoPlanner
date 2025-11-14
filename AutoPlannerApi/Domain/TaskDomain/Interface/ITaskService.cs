@@ -10,6 +10,8 @@ namespace AutoPlannerApi.Domain.TaskDomain.Interface
 
         public Task<GetByUserIdAnswerDomain> Get(int userId);
 
+        public Task<TaskGetDomain> GetById(int taskId);
+
         public Task<TaskForEditAnswerStatusDomain> Edit(TaskForEditDomain taskForEdit);
 
         public Task<DeleteTaskAnswerStatusDomain> Delete(int taskId);

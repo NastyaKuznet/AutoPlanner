@@ -229,6 +229,38 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     userTasksDomain);
         }
 
+        public async Task<TaskGetDomain> GetById(int taskId)
+        {
+            var task = await _taskDatabaseRepository.GetById(taskId);
+            
+            return new TaskGetDomain(
+                    task.Id,
+                    task.UserId,
+                    task.Name,
+                    task.Description,
+                    task.CreatedDate,
+                    task.Priority,
+                    task.StartDateTime,
+                    task.EndDateTime,
+                    task.Duration,
+                    task.IsRepit,
+                    task.RepitTime,
+                    task.IsRepitFromStart,
+                    task.CountRepit,
+                    task.StartDateTimeRepit,
+                    task.EndDateTimeRepit,
+                    task.RuleOneTask,
+                    task.StartDateTimeRuleOneTask,
+                    task.EndDateTimeRuleOneTask,
+                    task.RuleTwoTask,
+                    task.TimePositionRegardingTaskId,
+                    task.SecondTaskId,
+                    task.RelationRangeId,
+                    task.DateTimeRange,
+                    task.IsComplete,
+                    task.CompleteDateTime);
+        }
+
         public async Task<SetCompleteAnswerStatusDomain> SetComplete(int taskId)
         {
             var status = await _taskDatabaseRepository.SetComplete(taskId);

@@ -57,19 +57,19 @@ namespace AutoPlannerCore.Input.Model
         /// Если задача повторяется, то должно быть больше нуля, 
         /// кроме случаев, когда поле <see cref="EndTimeRepit"/> или <see cref="EndDateRepit"/> не равно null.
         /// </summary>
-        public int CountRepit { get; init; } = 0;
+        public int CountRepit { get; set; } = 0;
 
         /// <summary>
         /// Дата и время начала повторов задачи. 
         /// Если задача повторяется, то это поле должно быть равно <see cref="StartTime"/>, 
         /// и поле <see cref="CountRepit"/> должно быть больше нуля.
         /// </summary>
-        public DateTime? StartDateTimeRepit { get; init; }
+        public DateTime? StartDateTimeRepit { get; set; }
 
         /// <summary>
         /// Дата и время окончания повторов задачи.
         /// </summary>
-        public DateTime? EndDateTimeRepit { get; init; }
+        public DateTime? EndDateTimeRepit { get; set; }
 
         /// <summary>
         /// Правило о допустимом или не допустимом диапазоне существования. Может быть null.
