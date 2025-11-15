@@ -4,20 +4,27 @@ using AutoPlannerApi.Data.TaskData.Model;
 using AutoPlannerApi.Data.TaskData.Model.Answer;
 using AutoPlannerApi.Data.TaskData.Model.Answer.AnswerStatus;
 using Npgsql;
+using System.Data;
+using System.Reflection;
 
 namespace AutoPlannerApi.Data.TaskData.Realization
 {
     public class TaskPostgresRepository : ITaskDatabaseRepository
     {
         private readonly string _connectionString;
+        private readonly ILogger<TaskPostgresRepository> _logger;
 
-        public TaskPostgresRepository(string connectionString)
+        public TaskPostgresRepository(string connectionString, ILogger<TaskPostgresRepository> logger)
         {
             _connectionString = connectionString;
+            _logger = logger;
         }
 
         public async Task<AddTaskAnswerStatusData> Add(TaskForAddData taskForAdd, int userId)
         {
+            _logger.LogInformation("Начало добавления задачи. UserId: {UserId}, Name: {TaskName}",
+                userId, taskForAdd.Name);
+
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
@@ -78,12 +85,16 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка при добавлении задачи. UserId: {UserId}, Name: {TaskName}",
+                    userId, taskForAdd.Name);
+
                 return new AddTaskAnswerStatusData { Status = AddTaskAnswerStatusData.Bad };
             }
         }
 
         public async Task<DeleteTaskAnswerStatusDatabase> Delete(int taskId)
         {
+            _logger.LogInformation("Начало удаления задачи. TaskId: {TaskId}", taskId);
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
@@ -104,13 +115,18 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting task: {ex.Message}");
+                _logger.LogError(ex, "Ошибка при удалении задачи. TaskId: {TaskId}",
+                    taskId);
+
                 return new DeleteTaskAnswerStatusDatabase { Status = DeleteTaskAnswerStatusDatabase.Bad };
             }
         }
 
         public async Task<TaskForEditAnswerStatusData> Edit(TaskForEditDatabase taskForEdit)
         {
+            _logger.LogInformation("Начало редактирования задачи. TaskId: {TaskId}, Name: {TaskName}",
+                taskForEdit.Id, taskForEdit.Name);
+
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
@@ -172,6 +188,7 @@ namespace AutoPlannerApi.Data.TaskData.Realization
 
                 if (rowsAffected == 0)
                 {
+                    _logger.LogWarning("Задача не найдена при редактировании. TaskId: {TaskId}", taskForEdit.Id);
                     return new TaskForEditAnswerStatusData { Status = TaskForEditAnswerStatusData.TaskNotExist };
                 }
 
@@ -179,13 +196,17 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error editing task: {ex.Message}");
+                _logger.LogError(ex, "Ошибка при редактировании задачи. TaskId: {TaskId}",
+                    taskForEdit.Id);
+
                 return new TaskForEditAnswerStatusData { Status = TaskForEditAnswerStatusData.Bad };
             }
         }
 
         public async Task<GetByUserIdAnswerData> Get(int userId)
         {
+            _logger.LogInformation("Начало получения задач по UserId: {UserId}", userId);
+
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
@@ -262,7 +283,9 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting tasks: {ex.Message}");
+                _logger.LogError(ex, "Ошибка при получении задач по UserId: {UserId}",
+                    userId);
+
                 return new GetByUserIdAnswerData(
                     new ClassicAnswerStatus { Status = ClassicAnswerStatus.Bad },
                     new List<TaskDatabase>()
@@ -270,8 +293,97 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
         }
 
+        public async Task<TaskDatabase> GetById(int id)
+        {
+            _logger.LogInformation("Начало получения задачи по Id: {TaskId}", id);
+
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync();
+
+                var sql = "SELECT * FROM tasks WHERE id = @id";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("id", id);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    TimeSpan? duration = null;
+                    if (!reader.IsDBNull("duration"))
+                    {
+                        var durationString = reader.GetString("duration");
+                        if (TimeSpan.TryParse(durationString, out TimeSpan parsedDuration))
+                        {
+                            duration = parsedDuration;
+                        }
+                    }
+
+                    TimeSpan? repitTime = null;
+                    if (!reader.IsDBNull("repit_time"))
+                    {
+                        var repitTimeString = reader.GetString("repit_time");
+                        if (TimeSpan.TryParse(repitTimeString, out TimeSpan parsedRepitTime))
+                        {
+                            repitTime = parsedRepitTime;
+                        }
+                    }
+
+                    TimeSpan? dateTimeRange = null;
+                    if (!reader.IsDBNull("date_time_range"))
+                    {
+                        var dateTimeRangeString = reader.GetString("date_time_range");
+                        if (TimeSpan.TryParse(dateTimeRangeString, out TimeSpan parsedDateTimeRange))
+                        {
+                            dateTimeRange = parsedDateTimeRange;
+                        }
+                    }
+
+                    return new TaskDatabase(
+                        reader.GetInt32("id"),
+                        reader.GetInt32("user_id"),
+                        reader.GetString("name"),
+                        reader.IsDBNull("description") ? null : reader.GetString("description"),
+                        reader.GetDateTime("created_date"),
+                        reader.GetInt32("priority"),
+                        reader.IsDBNull("start_date_time") ? null : reader.GetDateTime("start_date_time"),
+                        reader.IsDBNull("end_date_time") ? null : reader.GetDateTime("end_date_time"),
+                        duration,
+                        reader.GetBoolean("is_repit"),
+                        repitTime,
+                        reader.GetBoolean("is_repit_from_start"),
+                        reader.GetInt32("count_repit"),
+                        reader.IsDBNull("start_date_time_repit") ? null : reader.GetDateTime("start_date_time_repit"),
+                        reader.IsDBNull("end_date_time_repit") ? null : reader.GetDateTime("end_date_time_repit"),
+                        reader.GetBoolean("rule_one_task"),
+                        reader.IsDBNull("start_date_time_rule_one_task") ? null : reader.GetDateTime("start_date_time_rule_one_task"),
+                        reader.IsDBNull("end_date_time_rule_one_task") ? null : reader.GetDateTime("end_date_time_rule_one_task"),
+                        reader.GetBoolean("rule_two_task"),
+                        reader.GetInt32("time_position_regarding_task_id"),
+                        reader.IsDBNull("second_task_id") ? 0 : reader.GetInt32("second_task_id"),
+                        reader.GetInt32("relation_range_id"),
+                        dateTimeRange,
+                        reader.GetBoolean("is_complete"),
+                        reader.IsDBNull("complete_date_time") ? null : reader.GetDateTime("complete_date_time")
+                    );
+                }
+
+                _logger.LogWarning("Задача не найдена по Id: {TaskId}", id);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при получении задачи по Id: {TaskId}",
+                    id);
+
+                return null;
+            }
+        }
+
         public async Task<SetCompleteAnswerStatusDatabase> SetComplete(int taskId)
         {
+            _logger.LogInformation("Начало отметки задачи как выполненной. TaskId: {TaskId}", taskId);
+
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
@@ -298,7 +410,9 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error setting task complete: {ex.Message}");
+                _logger.LogError(ex, "Ошибка при отметке задачи как выполненной. TaskId: {TaskId}",
+                    taskId);
+
                 return new SetCompleteAnswerStatusDatabase { Status = SetCompleteAnswerStatusDatabase.Bad };
             }
         }

@@ -37,6 +37,8 @@ builder.Services.AddSingleton<ITaskDatabaseRepository, TaskPostgresRepository>(p
     new TaskPostgresRepository(connectionString));
 builder.Services.AddSingleton<ITimeTableItemDatabaseRepository, TimeTableItemPostgresRepository>(provider =>
     new TimeTableItemPostgresRepository(connectionString));
+builder.Services.AddSingleton<IPlanningTaskDatabaseRepository, PlanningTaskPostgresRepository>(provider =>
+    new PlanningTaskPostgresRepository(connectionString));
 
 var app = builder.Build();
 
