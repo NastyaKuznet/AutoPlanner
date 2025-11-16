@@ -10,6 +10,8 @@ using AutoPlannerApi.Domain.TimeTableDomain.Interface;
 using AutoPlannerApi.Domain.TimeTableDomain.Realization;
 using AutoPlannerApi.Data.TimeTableData.Interface;
 using AutoPlannerApi.Data.TimeTableData.Realization;
+using AutoPlannerApi.Data.PlanningTaskData.Interface;
+using AutoPlannerApi.Data.PlanningTaskData.Realization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +21,24 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var connectionString = builder.Configuration.GetConnectionString("ConnectionDB");
+
 builder.Services.AddSingleton<IUserService, UserClassicService>();
-builder.Services.AddSingleton<IUserDatabaseRepository, UserRamRepository>();
+//builder.Services.AddSingleton<IUserDatabaseRepository, UserRamRepository>();
 builder.Services.AddSingleton<ITaskService, TaskClassicService>();
-builder.Services.AddSingleton<ITaskDatabaseRepository, TaskRamRepository>();
+//builder.Services.AddSingleton<ITaskDatabaseRepository, TaskRamRepository>();
 builder.Services.AddSingleton<ITimeTableItemService, TimeTableItemClassicService>();
-builder.Services.AddSingleton<ITimeTableItemDatabaseRepository, TimeTableItemRamRepository>();
+//builder.Services.AddSingleton<ITimeTableItemDatabaseRepository, TimeTableItemRamRepository>();
+
+builder.Services.AddSingleton<IUserDatabaseRepository, UserPostgresRepository>(provider =>
+    new UserPostgresRepository(connectionString));
+builder.Services.AddSingleton<ITaskDatabaseRepository, TaskPostgresRepository>(provider =>
+    new TaskPostgresRepository(connectionString));
+builder.Services.AddSingleton<ITimeTableItemDatabaseRepository, TimeTableItemPostgresRepository>(provider =>
+    new TimeTableItemPostgresRepository(connectionString));
+builder.Services.AddSingleton<IPlanningTaskDatabaseRepository, PlanningTaskPostgresRepository>(provider =>
+    new PlanningTaskPostgresRepository(connectionString));
 
 var app = builder.Build();
 

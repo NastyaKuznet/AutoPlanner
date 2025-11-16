@@ -6,7 +6,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Interface
 {
     public interface ITimeTableItemService
     {
-        public Task<(GetTTByUserIdAnswerStatusDomain, List<TimeTableItemDomain>)> Get(int userId);
+        public Task<(GetTTByUserIdAnswerStatusDomain, List<TimeTableItemDomain>, List<PlanningTaskDomain>)> Get(int userId);
         
         public Task<RecreateTimeTableAnswerDomain> Recreate(int userId, DateTime startTimeTable, DateTime endDateTime);
 

@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public DateTime CreatedDate { get; init; } = DateTime.Now;
 
@@ -67,12 +67,12 @@
         /// <summary>
         /// Дата и время начала периода.
         /// </summary>
-        public DateTime StartDateTimeRuleOneTask { get; init; }
+        public DateTime? StartDateTimeRuleOneTask { get; init; }
 
         /// <summary>
         /// Дата и время окончания периода.
         /// </summary>
-        public DateTime EndDateTimeRuleOneTask { get; init; }
+        public DateTime? EndDateTimeRuleOneTask { get; init; }
 
         /// <summary>
         /// Есть ли правило зависимости от других задач.

@@ -18,6 +18,7 @@ namespace AutoPlannerApi.Data.TimeTableData.Realization
                 timeTableItemForAdd.UserId,
                 timeTableItemForAdd.CountFrom,
                 timeTableItemForAdd.Name,
+                timeTableItemForAdd.Priority,
                 timeTableItemForAdd.StartDateTime,
                 timeTableItemForAdd.EndDateTime,
                 timeTableItemForAdd.IsComplete,

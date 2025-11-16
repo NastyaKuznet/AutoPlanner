@@ -17,6 +17,9 @@
         /// </summary>
         public string Name { get; }
 
+        /// <inheritdoc/>
+        public int Priority { get; set; } = 0;
+
         /// <summary>
         /// Дата и время начала задачи в расписании.
         /// </summary>
@@ -41,6 +44,7 @@
             int id, 
             int countFrom, 
             string name, 
+            int priority,
             DateTime startDateTime, 
             DateTime endDateTime, 
             bool isComplete, 
@@ -49,6 +53,7 @@
             Id = id;
             CountFrom = countFrom;
             Name = name;
+            Priority = priority;
             StartDateTime = startDateTime;
             EndDateTime = endDateTime;
             IsComplete = isComplete;
