@@ -144,7 +144,7 @@ namespace AutoPlannerCore.Planning
             else if (task.RuleTwoTask.RelationRange == RelationRangeType.Less && task.RuleTwoTask.TimePositionRegardingTask == TimePosition.After)
             {
                 task.StartDateTimeRange = secondTaskInTable.EndDateTime;
-                task.EndDateTimeRange = secondTaskInTable.EndDateTime + task.RuleTwoTask.DateTimeRange;
+                task.EndDateTimeRange = secondTaskInTable.EndDateTime + task.RuleTwoTask.DateTimeRange + task.Duration;
             }
         }
 
