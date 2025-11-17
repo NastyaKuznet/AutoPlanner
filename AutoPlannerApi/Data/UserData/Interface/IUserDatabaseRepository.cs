@@ -5,7 +5,7 @@ namespace AutoPlannerApi.Data.UserData.Interface
 {
     public interface IUserDatabaseRepository
     {
-        public Task Registrate(UserForRegistrationDatabase userForRegistration);
+        public Task<int> Registrate(UserForRegistrationAndAuthorizationDatabase userForRegistration);
         public Task<IReadOnlyCollection<UserDatabase>> GetUsers();
 
         public Task<CheckAnswerStatusDatabase> Check(int userId);

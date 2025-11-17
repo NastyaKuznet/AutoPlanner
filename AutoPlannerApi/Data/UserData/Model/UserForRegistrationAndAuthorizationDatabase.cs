@@ -1,11 +1,11 @@
 ﻿namespace AutoPlannerApi.Data.UserData.Model
 {
-    public class UserForRegistrationDatabase
+    public class UserForRegistrationAndAuthorizationDatabase
     {
         public string Nickname { get; }
         public string Password { get; }
 
-        public UserForRegistrationDatabase(string nickname, string password)
+        public UserForRegistrationAndAuthorizationDatabase(string nickname, string password)
         {
             Nickname = nickname;
             Password = password;

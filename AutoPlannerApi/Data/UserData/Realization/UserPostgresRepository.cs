@@ -16,7 +16,12 @@ namespace AutoPlannerApi.Data.UserData.Realization
             throw new NotImplementedException();
         }
 
-        public Task Registrate(UserForRegistrationDatabase userForRegistration)
+        public Task Registrate(UserForRegistrationAndAuthorizationDatabase userForRegistration)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<int> IUserDatabaseRepository.Registrate(UserForRegistrationAndAuthorizationDatabase userForRegistration)
         {
             throw new NotImplementedException();
         }
