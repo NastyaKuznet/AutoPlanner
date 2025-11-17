@@ -1,4 +1,5 @@
-﻿using AutoPlannerCore.Output.Model;
+﻿using AutoPlannerCore.Input.Model;
+using AutoPlannerCore.Output.Model;
 using AutoPlannerCore.Planning;
 using AutoPlannerCore.Planning.Model;
 
@@ -49,6 +50,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 1,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 30, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 2,
             };
@@ -57,6 +63,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 2,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -73,15 +84,18 @@ namespace AutoPlannerCore.Test.PlannerTest
                     new TimeTableItem()
                     {
                         MyTaskId = 1,
+                        Priority = 2,
                         StartDateTime = new DateTime(2025, 10, 17, 11, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 12, 00, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 2,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 11, 00, 00),
-                    }
+                    },
+                    
                 }
             };
 
@@ -97,6 +111,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 1,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 09, 50, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 09, 50, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 2,
             };
@@ -105,6 +124,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 2,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -121,12 +145,14 @@ namespace AutoPlannerCore.Test.PlannerTest
                     new TimeTableItem()
                     {
                         MyTaskId = 1,
+                        Priority = 2,
                         StartDateTime = new DateTime(2025, 10, 17, 11, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 12, 00, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 2,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 11, 00, 00),
                     }
@@ -145,6 +171,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 1,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 2,
             };
@@ -153,6 +184,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 2,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 11, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 11, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -161,6 +197,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 3,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 9, 30, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 09, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -178,18 +219,21 @@ namespace AutoPlannerCore.Test.PlannerTest
                     new TimeTableItem()
                     {
                         MyTaskId = 2,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 11, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 12, 30, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 1,
+                        Priority = 2,
                         StartDateTime = new DateTime(2025, 10, 17, 10, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 11, 30, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 3,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 9, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 10, 30, 00),
                     },
@@ -208,6 +252,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 1,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 2,
             };
@@ -216,6 +265,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 2,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 11, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 11, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -224,6 +278,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 3,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 9, 30, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 09, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -232,6 +291,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 4,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 12, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 12, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -251,24 +315,28 @@ namespace AutoPlannerCore.Test.PlannerTest
                     new TimeTableItem()
                     {
                         MyTaskId = 1,
+                        Priority = 2,
                         StartDateTime = new DateTime(2025, 10, 17, 10, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 11, 30, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 3,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 9, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 10, 30, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 2,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 13, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 14, 00, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 4,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 12, 00, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 13, 00, 00),
                     },
@@ -287,6 +355,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 1,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 10, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 10, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 2,
             };
@@ -295,6 +368,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 2,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 11, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 11, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -304,6 +382,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 StartDateTimeRange = new DateTime(2025, 10, 17, 9, 30, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
                 Duration = new TimeSpan(1, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 09, 30, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Priority = 1,
             };
             var task4 = new PlanningTask()
@@ -311,6 +394,11 @@ namespace AutoPlannerCore.Test.PlannerTest
                 MyTaskId = 4,
                 StartDateTimeRange = new DateTime(2025, 10, 17, 12, 00, 00),
                 EndDateTimeRange = new DateTime(2025, 10, 19, 10, 00, 00),
+                RuleOneTask = new RuleOneTask()
+                {
+                    StartDateTime = new DateTime(2025, 10, 17, 12, 00, 00),
+                    EndDateTime = new DateTime(2025, 10, 19, 10, 00, 00),
+                },
                 Duration = new TimeSpan(1, 00, 00),
                 Priority = 1,
             };
@@ -329,24 +417,28 @@ namespace AutoPlannerCore.Test.PlannerTest
                      new TimeTableItem()
                     {
                         MyTaskId = 4,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 12, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 13, 30, 00),
                     },
                      new TimeTableItem()
                     {
                         MyTaskId = 2,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 11, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 12, 30, 00),
                     },
                      new TimeTableItem()
                     {
                         MyTaskId = 3,
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 10, 17, 9, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 10, 30, 00),
                     },
                     new TimeTableItem()
                     {
                         MyTaskId = 1,
+                        Priority = 2,
                         StartDateTime = new DateTime(2025, 10, 17, 10, 30, 00),
                         EndDateTime =  new DateTime(2025, 10, 17, 11, 30, 00),
                     },

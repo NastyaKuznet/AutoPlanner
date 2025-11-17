@@ -233,7 +233,7 @@ namespace AutoPlannerCore.Planning
                     _pocket.Clear();
                 }
                 var newCheckStart = (DateTime)findTask.EndDateTime;
-                var newCheckEnd = (DateTime)(newCheckStart + findTask.Duration);
+                var newCheckEnd = (DateTime)(newCheckStart + baseTask.Duration);
 
                 CheckEndIsNotEndRangeTet(table, newCheckStart, newCheckEnd, baseTask, allPlanningTask);
             }
