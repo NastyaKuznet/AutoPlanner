@@ -141,13 +141,11 @@ namespace AutoPlannerApi.Data.PlanningTaskData.Realization
                 while (await reader.ReadAsync())
                 {
                     TimeSpan? duration = null;
-                    if (!reader.IsDBNull("duration"))
+                    int durationOrdinal = reader.GetOrdinal("duration");
+                    if (!reader.IsDBNull(durationOrdinal))
                     {
-                        var durationString = reader.GetString("duration");
-                        if (TimeSpan.TryParse(durationString, out TimeSpan parsedDuration))
-                        {
-                            duration = parsedDuration;
-                        }
+                        // Читаем напрямую как TimeSpan, а не как строку
+                        duration = reader.GetTimeSpan(durationOrdinal);
                     }
 
                     TimeSpan? dateTimeRange = null;
