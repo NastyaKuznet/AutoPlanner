@@ -149,6 +149,25 @@ namespace AutoPlannerApi.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Unknow error.");
         }
 
+        [HttpPut("complete/repit")]
+        public async Task<IActionResult> SetCompleteForRepit([FromForm] int taskId, [FromForm] int countFrom)
+        {
+            var status = await _taskService.SetCompleteForRepit(taskId, countFrom);
+            if (status.Status == SetCompleteForRepitTaskStatusDomain.Good)
+            {
+                return Ok();
+            }
+            if (status.Status == SetCompleteForRepitTaskStatusDomain.TaskNotExist)
+            {
+                return BadRequest("Task with this id not found.");
+            }
+            if (status.Status == SetCompleteForRepitTaskStatusDomain.Bad)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Task wasn`t set complete.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unknow error.");
+        }
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> Get([FromRoute] int userId)
         {

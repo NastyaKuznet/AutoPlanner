@@ -17,5 +17,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Interface
         public Task<DeleteTaskAnswerStatusDomain> Delete(int taskId);
 
         public Task<SetCompleteAnswerStatusDomain> SetComplete(int taskId);
+
+        public Task<SetCompleteForRepitTaskStatusDomain> SetCompleteForRepit(int taskId, int countFrom);
     }
 }
