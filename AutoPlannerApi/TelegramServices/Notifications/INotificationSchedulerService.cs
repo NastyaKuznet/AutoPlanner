@@ -2,7 +2,7 @@
 {
     public interface INotificationSchedulerService
     {
-        Task ScheduleUserNotificationsAsync(int userId, long chatId);
+        Task ScheduleUserNotificationsAsync(int userId);
         Task RescheduleAllNotificationsAsync();
     }
 }

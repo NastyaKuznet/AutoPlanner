@@ -25,22 +25,37 @@ namespace AutoPlannerApi.TelegramServices.Notifications
             _userRepository = userRepository;
         }
 
-        public async Task ScheduleUserNotificationsAsync(int userId, long chatId)
+        public async Task ScheduleUserNotificationsAsync(int userId)
         {
-            var tasks = await _linkingService.GetUserTasksForNotification(userId);
+            var user = await _userRepository.GetUserById(userId);
+            if (user?.TelegramChatId == null)
+            {
+                _logger.LogInformation("Пользователь {UserId} не имеет привязанного Telegram", userId);
+                return;
+            }
 
-            TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Yekaterinburg");
+            var tasks = await _linkingService.GetUserTasksForNotification(userId);
+            var chatId = user.TelegramChatId.Value;
+
+            TimeZoneInfo ekbTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Yekaterinburg");
+
+            _logger.LogInformation("Планирование уведомлений для пользователя {UserId}, задач: {TaskCount}", userId, tasks.Count);
 
             foreach (var task in tasks)
             {
                 DateTime taskTimeUtc = TimeZoneInfo.ConvertTimeToUtc(
-                DateTime.SpecifyKind(task.StartDateTime, DateTimeKind.Unspecified), moscowTimeZone);
+                    DateTime.SpecifyKind(task.StartDateTime, DateTimeKind.Unspecified),
+                    ekbTimeZone);
 
                 var notificationTime = taskTimeUtc.AddMinutes(-15);
+
                 if (notificationTime > DateTime.UtcNow)
                 {
                     BackgroundJob.Schedule(() =>
                         SendNotificationAsync(task, chatId), notificationTime);
+
+                    _logger.LogDebug("Запланировано уведомление для задачи '{TaskName}' на {NotificationTime}",
+                        task.Name, notificationTime);
                 }
             }
         }
@@ -61,7 +76,7 @@ namespace AutoPlannerApi.TelegramServices.Notifications
 
             foreach (var user in usersWithTelegram)
             {
-                await ScheduleUserNotificationsAsync(user.Id, user.TelegramChatId.Value);
+                await ScheduleUserNotificationsAsync(user.Id);
             }
         }
     }

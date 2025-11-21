@@ -75,7 +75,7 @@ namespace AutoPlannerApi.TelegramServices.Telegram.Handlers.CommandHandlers
                     _logger.LogInformation("Успешная привязка пользователя {UserId} к chatId {ChatId}",
                         result.UserId, chatId);
 
-                    await _notificationService.ScheduleUserNotificationsAsync(result.UserId, chatId);
+                    await _notificationService.ScheduleUserNotificationsAsync(result.UserId);
 
                     await _botService.SendMessageAsync(chatId,
                         $"Привет, {result.UserName}!\n\n" +

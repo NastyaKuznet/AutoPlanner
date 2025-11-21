@@ -144,7 +144,6 @@ namespace AutoPlannerApi.Data.PlanningTaskData.Realization
                     int durationOrdinal = reader.GetOrdinal("duration");
                     if (!reader.IsDBNull(durationOrdinal))
                     {
-                        // Читаем напрямую как TimeSpan, а не как строку
                         duration = reader.GetTimeSpan(durationOrdinal);
                     }
 
