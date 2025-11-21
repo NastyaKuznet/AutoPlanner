@@ -68,5 +68,71 @@ namespace AutoPlannerApi.Data.UserData.Realization
                 await command.ExecuteNonQueryAsync();
             }
         }
+
+        public async Task<UserDatabase> GetUserByTelegramChatId(long chatId)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new NpgsqlCommand(
+                    "SELECT id, nickname, password, telegram_chat_id FROM users WHERE telegram_chat_id = @chatId",
+                    connection);
+                command.Parameters.AddWithValue("chatId", chatId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return new UserDatabase(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.IsDBNull(3) ? null : reader.GetInt64(3));
+                    }
+                }
+            }
+            return null;
+        }
+
+        public async Task<UserDatabase> GetUserById(int userId)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new NpgsqlCommand(
+                    "SELECT id, nickname, password, telegram_chat_id FROM users WHERE id = @id",
+                    connection);
+                command.Parameters.AddWithValue("id", userId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return new UserDatabase(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.IsDBNull(3) ? null : reader.GetInt64(3));
+                    }
+                }
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateUserTelegramChatId(int userId, long chatId)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new NpgsqlCommand(
+                    "UPDATE users SET telegram_chat_id = @chatId WHERE id = @userId",
+                    connection);
+                command.Parameters.AddWithValue("chatId", chatId);
+                command.Parameters.AddWithValue("userId", userId);
+
+                var rowsAffected = await command.ExecuteNonQueryAsync();
+                return rowsAffected > 0;
+            }
+        }
     }
 }

@@ -33,5 +33,20 @@ namespace AutoPlannerApi.Data.UserData.Realization
             }
             return Task.FromResult(new CheckAnswerStatusDatabase() { Status = CheckAnswerStatusDatabase.UserNotExist });
         }
+
+        public Task<UserDatabase> GetUserByTelegramChatId(long chatId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateUserTelegramChatId(int userId, long chatId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDatabase> GetUserById(int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
