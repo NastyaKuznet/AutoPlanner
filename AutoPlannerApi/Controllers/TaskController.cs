@@ -150,7 +150,7 @@ namespace AutoPlannerApi.Controllers
         }
 
         [HttpPut("complete/repit")]
-        public async Task<IActionResult> SetCompleteForRepit([FromForm] int taskId, [FromForm] int countFrom)
+        public async Task<IActionResult> SetCompleteForRepit(int taskId, int countFrom)
         {
             var status = await _taskService.SetCompleteForRepit(taskId, countFrom);
             if (status.Status == SetCompleteForRepitTaskStatusDomain.Good)
