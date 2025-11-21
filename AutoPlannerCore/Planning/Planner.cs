@@ -220,7 +220,7 @@ namespace AutoPlannerCore.Planning
             DateTime checkEnd,
             IReadOnlyCollection<PlanningTask> allPlanningTask)
         {
-            if (CheckHighPriority(baseTask, findTask))
+            if (CheckHighPriority(baseTask, findTask) && !findTask.IsComplete)
             {
                 PutTaskIntoPocketFromTable(findTask, table);
                 CheckFreeTet(table, checkStart, checkEnd, baseTask, allPlanningTask);
