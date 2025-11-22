@@ -14,9 +14,11 @@ using AutoPlannerApi.Domain.TimeTableDomain.Model.Answer;
 using AutoPlannerApi.Domain.TimeTableDomain.Model.Answer.AnswerStatus;
 using AutoPlannerApi.Domain.UserDomain.Interface;
 using AutoPlannerApi.Domain.UserDomain.Model.AnswerStatus;
+using AutoPlannerApi.TelegramServices.Notifications;
 using AutoPlannerCore.Input.Model;
 using AutoPlannerCore.Output.Model;
 using AutoPlannerCore.Planning;
+using Hangfire;
 
 namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
 {
@@ -26,7 +28,8 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
         private IUserService _userService;
         private ITaskService _taskService;
         private IPlanningTaskDatabaseRepository _planningTaskDatabaseRepository;
-        
+
+
         public TimeTableItemClassicService(
             ITimeTableItemDatabaseRepository timeTableDatabaseRepository,
             IUserService userService,
@@ -397,6 +400,10 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     new List<TimeTableItemDomain>(),
                     new List<PlanningTaskDomain>());
             }
+
+            BackgroundJob.Enqueue<INotificationSchedulerService>(x =>
+                x.ScheduleUserNotificationsAsync(userId));
+
             return new RecreateTimeTableAnswerDomain(
                 new RecreateTimeTableAnswerStatusDomain()
                 {
