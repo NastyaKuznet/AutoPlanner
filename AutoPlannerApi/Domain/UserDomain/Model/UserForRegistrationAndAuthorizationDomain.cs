@@ -1,11 +1,11 @@
 ﻿namespace AutoPlannerApi.Domain.UserDomain.Model
 {
-    public class UserForRegistrationDomain
+    public class UserForRegistrationAndAuthorizationDomain
     {
         public string Nickname { get; set; }
         public string Password { get; set; }
 
-        public UserForRegistrationDomain(string nickname, string password)
+        public UserForRegistrationAndAuthorizationDomain(string nickname, string password)
         {
             Nickname = nickname;
             Password = password;

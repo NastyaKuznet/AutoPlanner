@@ -220,7 +220,7 @@ namespace AutoPlannerCore.Planning
             DateTime checkEnd,
             IReadOnlyCollection<PlanningTask> allPlanningTask)
         {
-            if (CheckHighPriority(baseTask, findTask))
+            if (CheckHighPriority(baseTask, findTask) && !findTask.IsComplete)
             {
                 PutTaskIntoPocketFromTable(findTask, table);
                 CheckFreeTet(table, checkStart, checkEnd, baseTask, allPlanningTask);
@@ -233,7 +233,7 @@ namespace AutoPlannerCore.Planning
                     _pocket.Clear();
                 }
                 var newCheckStart = (DateTime)findTask.EndDateTime;
-                var newCheckEnd = (DateTime)(newCheckStart + findTask.Duration);
+                var newCheckEnd = (DateTime)(newCheckStart + baseTask.Duration);
 
                 CheckEndIsNotEndRangeTet(table, newCheckStart, newCheckEnd, baseTask, allPlanningTask);
             }

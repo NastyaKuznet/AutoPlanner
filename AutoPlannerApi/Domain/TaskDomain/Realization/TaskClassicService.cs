@@ -289,5 +289,20 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                 Status = map2[statusTTI.Status]
             };
         }
+
+        public async Task<SetCompleteForRepitTaskStatusDomain> SetCompleteForRepit(int taskId, int countFrom)
+        {
+            var status = await _timeTableItemRepository.SetCompleteForRepit(taskId, countFrom);
+            var map = new Dictionary<int, int>()
+            {
+                { SetCompleteForRepitAnswerStatusDatabase.Good, SetCompleteForRepitTaskStatusDomain.Good },
+                { SetCompleteForRepitAnswerStatusDatabase.Bad, SetCompleteForRepitTaskStatusDomain.Bad },
+                { SetCompleteForRepitAnswerStatusDatabase.ItemNotExist, SetCompleteForRepitTaskStatusDomain.TaskNotExist },
+            };
+            return new SetCompleteForRepitTaskStatusDomain()
+            {
+                Status = map[status.Status]
+            };
+        }
     }
 }

@@ -279,26 +279,18 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
 
             var afterTTI = new List<TimeTableItemDomain>();
             var flag = false;
-            var alreadyExistInDatabase = await _timeTableDatabaseRepository.Get(userId);
-            if (alreadyExistInDatabase.Status.Status == ClassicAnswerStatus.Bad)
-            {
-                if (flag)
-                {
-                    return new RecreateTimeTableAnswerDomain(
-                        new RecreateTimeTableAnswerStatusDomain()
-                        {
-                            Status = RecreateTimeTableAnswerStatusDomain.Bad,
-                        },
-                        new List<TimeTableItemDomain>(),
-                        new List<PlanningTaskDomain>());
-                }
-            }
-            foreach (var forDelete in alreadyExistInDatabase.TimeTableItems)
+            foreach (var forDelete in getTimeTablesAnswer.TimeTableItems)
             {
                 await _timeTableDatabaseRepository.Delete(forDelete.MyTaskId);
             }
             foreach (var afterTimeTableItems in table.TimeTableItems) 
             {
+                var maybeComplete = false;
+                if (getTimeTablesAnswer.TimeTableItems.Count(x => x.MyTaskId == afterTimeTableItems.MyTaskId && x.CountFrom == afterTimeTableItems.CountFrom) != 0)
+                {
+                    maybeComplete = getTimeTablesAnswer.TimeTableItems.First(x => x.MyTaskId == afterTimeTableItems.MyTaskId && x.CountFrom == afterTimeTableItems.CountFrom).IsComplete;
+                }
+                    
                 afterTTI.Add(new TimeTableItemDomain(
                     afterTimeTableItems.MyTaskId,
                     userId,
@@ -307,7 +299,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     afterTimeTableItems.Priority,
                     afterTimeTableItems.StartDateTime,
                     afterTimeTableItems.EndDateTime,
-                    afterTimeTableItems.IsComplete,
+                    afterTimeTableItems.IsComplete || maybeComplete,
                     afterTimeTableItems.CompleteDateTime));
 
                 var state = await _timeTableDatabaseRepository.Add(
@@ -319,7 +311,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         afterTimeTableItems.Priority,
                         afterTimeTableItems.StartDateTime,
                         afterTimeTableItems.EndDateTime,
-                        afterTimeTableItems.IsComplete,
+                        afterTimeTableItems.IsComplete || maybeComplete,
                         afterTimeTableItems.CompleteDateTime));
                 if (state.Status != AddTimeTableItemAnswerStatusDatabase.Good)
                 {

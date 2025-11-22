@@ -55,17 +55,18 @@ namespace AutoPlannerApi.Data.UserData.Realization
             return users;
         }
 
-        public async Task Registrate(UserForRegistrationDatabase userForRegistration)
+        public async Task<int> Registrate(UserForRegistrationAndAuthorizationDatabase userForRegistration)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
                 var command = new NpgsqlCommand(
-                    "INSERT INTO users (nickname, password) VALUES (@nickname, @password)",
+                    "INSERT INTO users (nickname, password) VALUES (@nickname, @password) RETURNING id",
                     connection);
                 command.Parameters.AddWithValue("nickname", userForRegistration.Nickname);
                 command.Parameters.AddWithValue("password", userForRegistration.Password);
-                await command.ExecuteNonQueryAsync();
+                var result = await command.ExecuteScalarAsync();
+                return Convert.ToInt32(result);
             }
         }
 

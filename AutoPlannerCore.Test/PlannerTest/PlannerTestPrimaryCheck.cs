@@ -337,6 +337,7 @@ namespace AutoPlannerCore.Test.PlannerTest
                     {
                         MyTaskId = 1,
                         Name = "Сходить в прачку",
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 9, 18, 8, 40, 0),
                         EndDateTime =  new DateTime(2025, 9, 18, 8, 50, 0),
                     },
@@ -344,6 +345,7 @@ namespace AutoPlannerCore.Test.PlannerTest
                     {
                         MyTaskId = 2,
                         Name = "Собрать сушилку",
+                        Priority = 1,
                         StartDateTime = new DateTime(2025, 9, 18, 9, 5, 0),
                         EndDateTime =  new DateTime(2025, 9, 18, 9, 15, 0),
                     },
