@@ -169,5 +169,39 @@ namespace AutoPlannerApi.Data.TimeTableData.Realization
                 return new SetCompleteTimeTableItemAnswerStatusDatabase { Status = SetCompleteTimeTableItemAnswerStatusDatabase.Bad };
             }
         }
+
+        public async Task<SetCompleteForRepitAnswerStatusDatabase> SetCompleteForRepit(int taskId, int countFrom)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync();
+
+                var sql = @"
+                    UPDATE timetable_items SET 
+                        is_complete = true, 
+                        complete_date_time = @completeDateTime 
+                    WHERE my_task_id = @taskId AND count_from = @countFrom";
+
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("taskId", taskId);
+                command.Parameters.AddWithValue("completeDateTime", DateTime.Now);
+                command.Parameters.AddWithValue("countFrom", countFrom);
+
+                var rowsAffected = await command.ExecuteNonQueryAsync();
+
+                if (rowsAffected == 0)
+                {
+                    return new SetCompleteForRepitAnswerStatusDatabase { Status = SetCompleteForRepitAnswerStatusDatabase.ItemNotExist };
+                }
+
+                return new SetCompleteForRepitAnswerStatusDatabase { Status = SetCompleteForRepitAnswerStatusDatabase.Good };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при пометке элемента расписания");
+                return new SetCompleteForRepitAnswerStatusDatabase { Status = SetCompleteForRepitAnswerStatusDatabase.Bad };
+            }
+        }
     }
 }
