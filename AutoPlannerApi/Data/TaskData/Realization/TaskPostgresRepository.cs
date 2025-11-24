@@ -310,32 +310,29 @@ namespace AutoPlannerApi.Data.TaskData.Realization
                 if (await reader.ReadAsync())
                 {
                     TimeSpan? duration = null;
-                    if (!reader.IsDBNull("duration"))
+                    int durationOrdinal = reader.GetOrdinal("duration");
+                    if (!reader.IsDBNull(durationOrdinal))
                     {
-                        var durationString = reader.GetString("duration");
-                        if (TimeSpan.TryParse(durationString, out TimeSpan parsedDuration))
-                        {
-                            duration = parsedDuration;
-                        }
+                        duration = reader.GetTimeSpan(durationOrdinal);
                     }
 
                     TimeSpan? repitTime = null;
                     if (!reader.IsDBNull("repit_time"))
                     {
-                        var repitTimeString = reader.GetString("repit_time");
-                        if (TimeSpan.TryParse(repitTimeString, out TimeSpan parsedRepitTime))
+                        var repitTimeString = reader.GetOrdinal("repit_time");
+                        if (!reader.IsDBNull(repitTimeString))
                         {
-                            repitTime = parsedRepitTime;
+                            repitTime = reader.GetTimeSpan(repitTimeString);
                         }
                     }
 
                     TimeSpan? dateTimeRange = null;
                     if (!reader.IsDBNull("date_time_range"))
                     {
-                        var dateTimeRangeString = reader.GetString("date_time_range");
-                        if (TimeSpan.TryParse(dateTimeRangeString, out TimeSpan parsedDateTimeRange))
+                        var dateTimeRangeString = reader.GetOrdinal("date_time_range");
+                        if (!reader.IsDBNull(dateTimeRangeString))
                         {
-                            dateTimeRange = parsedDateTimeRange;
+                            dateTimeRange = reader.GetTimeSpan(dateTimeRangeString);
                         }
                     }
 
