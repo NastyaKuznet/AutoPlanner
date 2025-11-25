@@ -19,7 +19,7 @@ namespace AutoPlannerApi.Controllers
         public async Task<IActionResult> GenerateLinkingCode([FromBody] GenerateLinkingCodeRequest request)
         {
             var code = await _linkingService.GenerateLinkingCode(request.UserId);
-            var telegramLink = $"https://t.me/autoplannernotifierbot?start={code}";
+            var telegramLink = $"https://t.me/auto_planner_bot?start={code}"; // autoplannernotifierbot
 
             return Ok(new GenerateLinkingCodeResponse
             {
