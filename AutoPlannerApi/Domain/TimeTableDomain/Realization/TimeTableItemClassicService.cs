@@ -103,7 +103,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     task.Priority,
                     task.StartDateTime,
                     task.EndDateTime,
-                    $"{task.Duration.Value.Days}:{task.Duration.Value.Hours}:{task.Duration.Value.Minutes}:{task.Duration.Value.Seconds}",
+                    $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.CountFrom,
                     task.IsComplete,
                     task.CompleteDateTime,
@@ -175,6 +175,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     secondTaskNeed.Add(taskGet);
                 }
                 else {
+                    Console.WriteLine($"!1!!!{taskGet.Duration}");
                     tasks.Add(new MyTask()
                     {
                         Id = taskGet.Id,
@@ -184,7 +185,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         Priority = taskGet.Priority,
                         StartDateTime = taskGet.StartDateTime,
                         EndDateTime = taskGet.EndDateTime,
-                        Duration = TimeSpan.ParseExact(taskGet.Duration, @"dd\:hh\:mm\:ss", null),
+                        Duration = TimeSpan.ParseExact(taskGet.Duration, @"d\:hh\:mm\:ss", null),
                         IsRepit = taskGet.IsRepit,
                         RepitDateTime = taskGet.RepitTime,
                         IsRepitFromStart = taskGet.IsRepitFromStart,
