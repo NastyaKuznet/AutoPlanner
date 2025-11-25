@@ -178,7 +178,9 @@ namespace AutoPlannerApi.Data.TaskData.Realization
                 command.Parameters.AddWithValue("endDateTimeRuleOneTask", taskForEdit.EndDateTimeRuleOneTask ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("ruleTwoTask", taskForEdit.RuleTwoTask);
                 command.Parameters.AddWithValue("timePositionRegardingTaskId", taskForEdit.TimePositionRegardingTaskId);
-                command.Parameters.AddWithValue("secondTaskId", taskForEdit.SecondTaskId);
+
+                var secondTaskIdValue = taskForEdit.SecondTaskId == 0 ? (object)DBNull.Value : taskForEdit.SecondTaskId;
+                command.Parameters.AddWithValue("secondTaskId", secondTaskIdValue);
                 command.Parameters.AddWithValue("relationRangeId", taskForEdit.RelationRangeId);
                 command.Parameters.AddWithValue("dateTimeRange", taskForEdit.DateTimeRange ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("isComplete", taskForEdit.IsComplete);
