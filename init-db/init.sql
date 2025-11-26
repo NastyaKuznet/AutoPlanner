@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS planning_tasks (
 CREATE TABLE IF NOT EXISTS sent_notifications (
     user_id INTEGER NOT NULL,
     task_id INTEGER NOT NULL,
+    job_id VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, task_id)
 );

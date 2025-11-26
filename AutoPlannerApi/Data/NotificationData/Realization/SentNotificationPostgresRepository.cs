@@ -29,90 +29,66 @@ namespace AutoPlannerApi.Data.NotificationData.Realization
             return result != null;
         }
 
-        public async Task<bool> AddAsync(int userId, int taskId)
+        public async Task<bool> AddAsync(int userId, int taskId, string jobId)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
             var sql = @"
-                INSERT INTO sent_notifications (user_id, task_id, created_at)
-                VALUES (@userId, @taskId, @createdAt)
-                ON CONFLICT (user_id, task_id) DO NOTHING";
+                INSERT INTO sent_notifications (user_id, task_id, job_id, created_at)
+                VALUES (@userId, @taskId, @jobId, @createdAt)
+                ON CONFLICT (user_id, task_id) DO UPDATE SET job_id = @jobId";
 
             using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("userId", userId);
             command.Parameters.AddWithValue("taskId", taskId);
+            command.Parameters.AddWithValue("jobId", jobId);
             command.Parameters.AddWithValue("createdAt", DateTime.Now);
 
             var rowsAffected = await command.ExecuteNonQueryAsync();
 
             if (rowsAffected > 0)
             {
-                _logger.LogDebug("Добавлена запись: UserId={UserId}, TaskId={TaskId}", userId, taskId);
+                _logger.LogDebug("Добавлена запись: UserId={UserId}, TaskId={TaskId}, JobId={JobId}", userId, taskId, jobId);
             }
 
             return rowsAffected > 0;
         }
 
-        public async Task<bool> RemoveAsync(int userId, int taskId)
+        public async Task<List<string>> RemoveByUserAsync(int userId)
         {
+            var jobIds = new List<string>();
+
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var sql = "DELETE FROM sent_notifications WHERE user_id = @userId AND task_id = @taskId";
+            var selectSql = "SELECT job_id FROM sent_notifications WHERE user_id = @userId";
+            using var selectCommand = new NpgsqlCommand(selectSql, connection);
+            selectCommand.Parameters.AddWithValue("userId", userId);
 
-            using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("userId", userId);
-            command.Parameters.AddWithValue("taskId", taskId);
+            using var reader = await selectCommand.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                if (!reader.IsDBNull(0))
+                {
+                    jobIds.Add(reader.GetString(0));
+                }
+            }
 
-            var rowsAffected = await command.ExecuteNonQueryAsync();
+            await reader.CloseAsync();
+                
+            var deleteSql = "DELETE FROM sent_notifications WHERE user_id = @userId";
+            using var deleteCommand = new NpgsqlCommand(deleteSql, connection);
+            deleteCommand.Parameters.AddWithValue("userId", userId);
+
+            var rowsAffected = await deleteCommand.ExecuteNonQueryAsync();
 
             if (rowsAffected > 0)
             {
-                _logger.LogDebug("Удалена запись: UserId={UserId}, TaskId={TaskId}", userId, taskId);
+                _logger.LogInformation("Удалены все уведомления пользователя {UserId}, JobIds: {JobIdsCount}", userId, jobIds.Count);
             }
 
-            return rowsAffected > 0;
-        }
-
-        public async Task<bool> RemoveByUserAsync(int userId)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var sql = "DELETE FROM sent_notifications WHERE user_id = @userId";
-
-            using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("userId", userId);
-
-            var rowsAffected = await command.ExecuteNonQueryAsync();
-
-            if (rowsAffected > 0)
-            {
-                _logger.LogInformation("Удалены все уведомления пользователя {UserId}", userId);
-            }
-
-            return rowsAffected > 0;
-        }
-
-        public async Task<bool> RemoveByTaskAsync(int taskId)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var sql = "DELETE FROM sent_notifications WHERE task_id = @taskId";
-
-            using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("taskId", taskId);
-
-            var rowsAffected = await command.ExecuteNonQueryAsync();
-
-            if (rowsAffected > 0)
-            {
-                _logger.LogInformation("Удалены все уведомления для задачи {TaskId}", taskId);
-            }
-
-            return rowsAffected > 0;
+            return jobIds;
         }
     }
 }

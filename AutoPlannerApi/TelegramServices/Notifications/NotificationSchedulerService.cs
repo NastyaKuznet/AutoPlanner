@@ -38,6 +38,14 @@ namespace AutoPlannerApi.TelegramServices.Notifications
                 return;
             }
 
+            var jobIdsToDelete = await _notificationRepository.RemoveByUserAsync(userId);
+
+            foreach (var jobId in jobIdsToDelete)
+            {
+                BackgroundJob.Delete(jobId);
+                _logger.LogDebug("Удален джоб {JobId} для пользователя {UserId}", jobId, userId);
+            }
+
             var tasks = await _linkingService.GetUserTasksForNotification(userId);
             var chatId = user.TelegramChatId.Value;
 
@@ -62,10 +70,10 @@ namespace AutoPlannerApi.TelegramServices.Notifications
 
                 if (notificationTime > DateTime.UtcNow)
                 {
-                    BackgroundJob.Schedule(() =>
+                    string jobId = BackgroundJob.Schedule(() =>
                         SendNotificationAsync(task, chatId), notificationTime);
 
-                    await _notificationRepository.AddAsync(userId, task.Id);
+                    await _notificationRepository.AddAsync(userId, task.Id, jobId);
 
                     _logger.LogInformation("Запланировано уведомление для задачи '{TaskName}' на {NotificationTime}",
                         task.Name, notificationTime);
