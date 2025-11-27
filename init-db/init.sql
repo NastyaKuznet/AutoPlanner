@@ -71,3 +71,14 @@ CREATE TABLE IF NOT EXISTS planning_tasks (
     date_time_range INTERVAL,
     PRIMARY KEY (user_id, my_task_id, count_from)
 );
+
+CREATE TABLE IF NOT EXISTS sent_notifications (
+    user_id INTEGER NOT NULL,
+    task_id INTEGER NOT NULL,
+    job_id VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, task_id)
+);
+
+CREATE INDEX idx_sent_notifications_user_id ON sent_notifications(user_id);
+CREATE INDEX idx_sent_notifications_task_id ON sent_notifications(task_id);

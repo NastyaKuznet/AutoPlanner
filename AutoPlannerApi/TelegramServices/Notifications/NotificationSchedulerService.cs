@@ -1,4 +1,5 @@
-﻿using AutoPlannerApi.Data.UserData.Interface;
+﻿using AutoPlannerApi.Data.NotificationData.Interface;
+using AutoPlannerApi.Data.UserData.Interface;
 using AutoPlannerApi.Domain.TimeTableDomain.Model;
 using AutoPlannerApi.Domain.UserDomain.Interface;
 using AutoPlannerApi.TelegramServices.Telegram;
@@ -12,17 +13,20 @@ namespace AutoPlannerApi.TelegramServices.Notifications
         private readonly ITelegramLinkingService _linkingService;
         private readonly ITelegramBotService _botService;
         private readonly IUserDatabaseRepository _userRepository;
+        private readonly ISentNotificationRepository _notificationRepository;
 
         public NotificationSchedulerService(
             ILogger<NotificationSchedulerService> logger,
             ITelegramLinkingService linkingService,
             ITelegramBotService botService,
-            IUserDatabaseRepository userRepository)
+            IUserDatabaseRepository userRepository,
+            ISentNotificationRepository notificationRepository)
         {
             _logger = logger;
             _linkingService = linkingService;
             _botService = botService;
             _userRepository = userRepository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task ScheduleUserNotificationsAsync(int userId)
@@ -34,6 +38,14 @@ namespace AutoPlannerApi.TelegramServices.Notifications
                 return;
             }
 
+            var jobIdsToDelete = await _notificationRepository.RemoveByUserAsync(userId);
+
+            foreach (var jobId in jobIdsToDelete)
+            {
+                BackgroundJob.Delete(jobId);
+                _logger.LogDebug("Удален джоб {JobId} для пользователя {UserId}", jobId, userId);
+            }
+
             var tasks = await _linkingService.GetUserTasksForNotification(userId);
             var chatId = user.TelegramChatId.Value;
 
@@ -43,6 +55,13 @@ namespace AutoPlannerApi.TelegramServices.Notifications
 
             foreach (var task in tasks)
             {
+                var alreadyExists = await _notificationRepository.ExistsAsync(userId, task.Id);
+                if (alreadyExists)
+                {
+                    _logger.LogInformation("Пропускаем задачу '{TaskName}' - уведомление уже было", task.Name);
+                    continue;
+                }
+
                 DateTime taskTimeUtc = TimeZoneInfo.ConvertTimeToUtc(
                     DateTime.SpecifyKind(task.StartDateTime, DateTimeKind.Unspecified),
                     ekbTimeZone);
@@ -51,10 +70,12 @@ namespace AutoPlannerApi.TelegramServices.Notifications
 
                 if (notificationTime > DateTime.UtcNow)
                 {
-                    BackgroundJob.Schedule(() =>
+                    string jobId = BackgroundJob.Schedule(() =>
                         SendNotificationAsync(task, chatId), notificationTime);
 
-                    _logger.LogDebug("Запланировано уведомление для задачи '{TaskName}' на {NotificationTime}",
+                    await _notificationRepository.AddAsync(userId, task.Id, jobId);
+
+                    _logger.LogInformation("Запланировано уведомление для задачи '{TaskName}' на {NotificationTime}",
                         task.Name, notificationTime);
                 }
             }

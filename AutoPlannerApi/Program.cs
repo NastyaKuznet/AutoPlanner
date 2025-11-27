@@ -21,6 +21,8 @@ using Hangfire;
 using AutoPlannerApi.TelegramServices.BackgroundJobs;
 using Hangfire.MemoryStorage;
 using AutoPlannerApi.TelegramServices.Telegram.Models;
+using AutoPlannerApi.Data.NotificationData.Interface;
+using AutoPlannerApi.Data.NotificationData.Realization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,9 @@ builder.Services.AddSingleton<ITimeTableItemDatabaseRepository, TimeTableItemPos
 builder.Services.AddSingleton<IPlanningTaskDatabaseRepository, PlanningTaskPostgresRepository>(provider =>
     new PlanningTaskPostgresRepository(connectionString, provider.GetRequiredService<ILogger<PlanningTaskPostgresRepository>>()));
 
+builder.Services.AddScoped<ISentNotificationRepository, SentNotificationPostgresRepository>(provider =>
+    new SentNotificationPostgresRepository(connectionString, provider.GetRequiredService<ILogger<SentNotificationPostgresRepository>>()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,10 +78,10 @@ app.UseSwaggerUI();
 
 app.UseHangfireDashboard("/hangfire");
 
-RecurringJob.AddOrUpdate<TelegramNotificationJob>(
+/*RecurringJob.AddOrUpdate<TelegramNotificationJob>(
     "reschedule-notifications",
     job => job.RescheduleAllNotifications(),
-    "*/20 * * * *");//Раз в 20 минут (Cron.Hourly - раз в час))
+    "Cron.Hourly");*/
 
 app.UseAuthorization();
 
