@@ -114,6 +114,7 @@ namespace AutoPlannerCore.Test.PreparingTaskForPlannerTest
             };
             var task = new PlanningTask()
             {
+                Duration = new TimeSpan(00, 10, 00),
                 RuleTwoTask = new RuleTwoTask()
                 {
                     RelationRange = RelationRangeType.Less,
@@ -131,7 +132,7 @@ namespace AutoPlannerCore.Test.PreparingTaskForPlannerTest
             {
                 RuleTwoTask = task.RuleTwoTask,
                 StartDateTimeRange = secondTaskTimeTableItem.EndDateTime,
-                EndDateTimeRange = new DateTime(2025, 09, 26, 19, 20, 00),
+                EndDateTimeRange = new DateTime(2025, 09, 26, 19, 30, 00),
             };
             Assert.IsTrue(expectedTask.Equals(task));
         }

@@ -95,5 +95,30 @@ namespace AutoPlannerApi.Data.TimeTableData.Realization
                 Status = SetCompleteTimeTableItemAnswerStatusDatabase.Good,
             });
         }
+
+        public Task<SetCompleteForRepitAnswerStatusDatabase> SetCompleteForRepit(int taskId, int countFrom)
+        {
+            var flag = false;
+            foreach (var item in _timeTableItems)
+            {
+                if (item.MyTaskId == taskId && item.CountFrom == countFrom)
+                {
+                    item.IsComplete = true;
+                    item.CompleteDateTime = DateTime.Now;
+                    flag = true;
+                }
+            }
+            if (!flag)
+            {
+                return Task.FromResult(new SetCompleteForRepitAnswerStatusDatabase()
+                {
+                    Status = SetCompleteForRepitAnswerStatusDatabase.ItemNotExist,
+                });
+            }
+            return Task.FromResult(new SetCompleteForRepitAnswerStatusDatabase()
+            {
+                Status = SetCompleteForRepitAnswerStatusDatabase.Good,
+            });
+        }
     }
 }

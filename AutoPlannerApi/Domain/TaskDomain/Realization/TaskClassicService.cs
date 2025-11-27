@@ -203,7 +203,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.Priority,
                     task.StartDateTime,
                     task.EndDateTime,
-                    task.Duration,
+                    $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.IsRepit,
                     task.RepitTime,
                     task.IsRepitFromStart,
@@ -242,7 +242,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.Priority,
                     task.StartDateTime,
                     task.EndDateTime,
-                    task.Duration,
+                    $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.IsRepit,
                     task.RepitTime,
                     task.IsRepitFromStart,
@@ -287,6 +287,21 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
             return new SetCompleteAnswerStatusDomain()
             {
                 Status = map2[statusTTI.Status]
+            };
+        }
+
+        public async Task<SetCompleteForRepitTaskStatusDomain> SetCompleteForRepit(int taskId, int countFrom)
+        {
+            var status = await _timeTableItemRepository.SetCompleteForRepit(taskId, countFrom);
+            var map = new Dictionary<int, int>()
+            {
+                { SetCompleteForRepitAnswerStatusDatabase.Good, SetCompleteForRepitTaskStatusDomain.Good },
+                { SetCompleteForRepitAnswerStatusDatabase.Bad, SetCompleteForRepitTaskStatusDomain.Bad },
+                { SetCompleteForRepitAnswerStatusDatabase.ItemNotExist, SetCompleteForRepitTaskStatusDomain.TaskNotExist },
+            };
+            return new SetCompleteForRepitTaskStatusDomain()
+            {
+                Status = map[status.Status]
             };
         }
     }

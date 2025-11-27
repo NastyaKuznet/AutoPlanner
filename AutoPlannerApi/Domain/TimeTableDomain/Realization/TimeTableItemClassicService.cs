@@ -19,6 +19,7 @@ using AutoPlannerCore.Input.Model;
 using AutoPlannerCore.Output.Model;
 using AutoPlannerCore.Planning;
 using Hangfire;
+using System.Threading.Tasks;
 
 namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
 {
@@ -102,7 +103,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     task.Priority,
                     task.StartDateTime,
                     task.EndDateTime,
-                    task.Duration,
+                    $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.CountFrom,
                     task.IsComplete,
                     task.CompleteDateTime,
@@ -174,6 +175,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     secondTaskNeed.Add(taskGet);
                 }
                 else {
+                    Console.WriteLine($"!1!!!{taskGet.Duration}");
                     tasks.Add(new MyTask()
                     {
                         Id = taskGet.Id,
@@ -183,7 +185,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         Priority = taskGet.Priority,
                         StartDateTime = taskGet.StartDateTime,
                         EndDateTime = taskGet.EndDateTime,
-                        Duration = taskGet.Duration,
+                        Duration = TimeSpan.ParseExact(taskGet.Duration, @"d\:hh\:mm\:ss", null),
                         IsRepit = taskGet.IsRepit,
                         RepitDateTime = taskGet.RepitTime,
                         IsRepitFromStart = taskGet.IsRepitFromStart,
@@ -227,7 +229,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     Priority = t.Priority,
                     StartDateTime = t.StartDateTime,
                     EndDateTime = t.EndDateTime,
-                    Duration = t.Duration,
+                    Duration = TimeSpan.ParseExact(t.Duration, @"dd\:hh\:mm\:ss", null),
                     IsRepit = t.IsRepit,
                     RepitDateTime = t.RepitTime,
                     IsRepitFromStart = t.IsRepitFromStart,
@@ -279,26 +281,18 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
 
             var afterTTI = new List<TimeTableItemDomain>();
             var flag = false;
-            var alreadyExistInDatabase = await _timeTableDatabaseRepository.Get(userId);
-            if (alreadyExistInDatabase.Status.Status == ClassicAnswerStatus.Bad)
-            {
-                if (flag)
-                {
-                    return new RecreateTimeTableAnswerDomain(
-                        new RecreateTimeTableAnswerStatusDomain()
-                        {
-                            Status = RecreateTimeTableAnswerStatusDomain.Bad,
-                        },
-                        new List<TimeTableItemDomain>(),
-                        new List<PlanningTaskDomain>());
-                }
-            }
-            foreach (var forDelete in alreadyExistInDatabase.TimeTableItems)
+            foreach (var forDelete in getTimeTablesAnswer.TimeTableItems)
             {
                 await _timeTableDatabaseRepository.Delete(forDelete.MyTaskId);
             }
             foreach (var afterTimeTableItems in table.TimeTableItems) 
             {
+                var maybeComplete = false;
+                if (getTimeTablesAnswer.TimeTableItems.Count(x => x.MyTaskId == afterTimeTableItems.MyTaskId && x.CountFrom == afterTimeTableItems.CountFrom) != 0)
+                {
+                    maybeComplete = getTimeTablesAnswer.TimeTableItems.First(x => x.MyTaskId == afterTimeTableItems.MyTaskId && x.CountFrom == afterTimeTableItems.CountFrom).IsComplete;
+                }
+                    
                 afterTTI.Add(new TimeTableItemDomain(
                     afterTimeTableItems.MyTaskId,
                     userId,
@@ -307,7 +301,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     afterTimeTableItems.Priority,
                     afterTimeTableItems.StartDateTime,
                     afterTimeTableItems.EndDateTime,
-                    afterTimeTableItems.IsComplete,
+                    afterTimeTableItems.IsComplete || maybeComplete,
                     afterTimeTableItems.CompleteDateTime));
 
                 var state = await _timeTableDatabaseRepository.Add(
@@ -319,7 +313,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         afterTimeTableItems.Priority,
                         afterTimeTableItems.StartDateTime,
                         afterTimeTableItems.EndDateTime,
-                        afterTimeTableItems.IsComplete,
+                        afterTimeTableItems.IsComplete || maybeComplete,
                         afterTimeTableItems.CompleteDateTime));
                 if (state.Status != AddTimeTableItemAnswerStatusDatabase.Good)
                 {
@@ -382,7 +376,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     aftPenTask.Priority,
                     aftPenTask.StartDateTime,
                     aftPenTask.EndDateTime,
-                    aftPenTask.Duration,
+                    $"{aftPenTask.Duration.Value.Days}:{aftPenTask.Duration.Value.Hours}:{aftPenTask.Duration.Value.Minutes}:{aftPenTask.Duration.Value.Seconds}",
                     aftPenTask.CountFrom,
                     aftPenTask.IsComplete,
                     aftPenTask.CompleteDateTime,

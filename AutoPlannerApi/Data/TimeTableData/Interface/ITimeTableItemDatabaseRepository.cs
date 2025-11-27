@@ -13,5 +13,7 @@ namespace AutoPlannerApi.Data.TimeTableData.Interface
         public Task<AddTimeTableItemAnswerStatusDatabase> Add(TimeTableItemForAddDatabase timeTableItemForAdd);
 
         public Task<SetCompleteTimeTableItemAnswerStatusDatabase> SetComplete(int taskId);
+
+        public Task<SetCompleteForRepitAnswerStatusDatabase> SetCompleteForRepit(int taskId, int countFrom);
     }
 }

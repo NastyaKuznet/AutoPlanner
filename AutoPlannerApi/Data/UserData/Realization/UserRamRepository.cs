@@ -1,5 +1,6 @@
 ﻿using AutoPlannerApi.Data.UserData.Interface;
 using AutoPlannerApi.Data.UserData.Model;
+using AutoPlannerApi.Data.UserData.Model.Answer;
 using AutoPlannerApi.Data.UserData.Model.AnswerStatus;
 
 namespace AutoPlannerApi.Data.UserData.Realization
@@ -8,13 +9,14 @@ namespace AutoPlannerApi.Data.UserData.Realization
     {
         private List<UserDatabase> _users = new List<UserDatabase>();
         private int _userId = 1;
-        public Task Registrate(UserForRegistrationDatabase userForRegistration)
+        public Task<int> Registrate(UserForRegistrationAndAuthorizationDatabase userForRegistration)
         {
+            var id = _userId++;
             _users.Add(new UserDatabase(
-                _userId++, 
+                id, 
                 userForRegistration.Nickname, 
                 userForRegistration.Password));
-            return Task.CompletedTask;
+            return Task.FromResult(id);
         }
 
         public Task<IReadOnlyCollection<UserDatabase>> GetUsers()

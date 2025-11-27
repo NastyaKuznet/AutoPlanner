@@ -150,10 +150,10 @@ namespace AutoPlannerApi.Data.PlanningTaskData.Realization
                     TimeSpan? dateTimeRange = null;
                     if (!reader.IsDBNull("date_time_range"))
                     {
-                        var dateTimeRangeString = reader.GetString("date_time_range");
-                        if (TimeSpan.TryParse(dateTimeRangeString, out TimeSpan parsedDateTimeRange))
+                        var dateTimeRangeString = reader.GetOrdinal("date_time_range");
+                        if (!reader.IsDBNull(dateTimeRangeString))
                         {
-                            dateTimeRange = parsedDateTimeRange;
+                            dateTimeRange = reader.GetTimeSpan(dateTimeRangeString);
                         }
                     }
 
