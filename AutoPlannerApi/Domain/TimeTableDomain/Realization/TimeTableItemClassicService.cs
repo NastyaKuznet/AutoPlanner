@@ -19,6 +19,7 @@ using AutoPlannerCore.Input.Model;
 using AutoPlannerCore.Output.Model;
 using AutoPlannerCore.Planning;
 using Hangfire;
+using System.Threading.Tasks;
 
 namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
 {
@@ -102,7 +103,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     task.Priority,
                     task.StartDateTime,
                     task.EndDateTime,
-                    task.Duration,
+                    $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.CountFrom,
                     task.IsComplete,
                     task.CompleteDateTime,
@@ -174,6 +175,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     secondTaskNeed.Add(taskGet);
                 }
                 else {
+                    Console.WriteLine($"!1!!!{taskGet.Duration}");
                     tasks.Add(new MyTask()
                     {
                         Id = taskGet.Id,
@@ -183,7 +185,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         Priority = taskGet.Priority,
                         StartDateTime = taskGet.StartDateTime,
                         EndDateTime = taskGet.EndDateTime,
-                        Duration = taskGet.Duration,
+                        Duration = TimeSpan.ParseExact(taskGet.Duration, @"d\:hh\:mm\:ss", null),
                         IsRepit = taskGet.IsRepit,
                         RepitDateTime = taskGet.RepitTime,
                         IsRepitFromStart = taskGet.IsRepitFromStart,
@@ -227,7 +229,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     Priority = t.Priority,
                     StartDateTime = t.StartDateTime,
                     EndDateTime = t.EndDateTime,
-                    Duration = t.Duration,
+                    Duration = TimeSpan.ParseExact(t.Duration, @"dd\:hh\:mm\:ss", null),
                     IsRepit = t.IsRepit,
                     RepitDateTime = t.RepitTime,
                     IsRepitFromStart = t.IsRepitFromStart,
@@ -374,7 +376,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     aftPenTask.Priority,
                     aftPenTask.StartDateTime,
                     aftPenTask.EndDateTime,
-                    aftPenTask.Duration,
+                    $"{aftPenTask.Duration.Value.Days}:{aftPenTask.Duration.Value.Hours}:{aftPenTask.Duration.Value.Minutes}:{aftPenTask.Duration.Value.Seconds}",
                     aftPenTask.CountFrom,
                     aftPenTask.IsComplete,
                     aftPenTask.CompleteDateTime,

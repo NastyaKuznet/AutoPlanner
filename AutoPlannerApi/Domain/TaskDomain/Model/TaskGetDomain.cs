@@ -26,7 +26,7 @@
         /// <summary>
         /// Продолжительность задачи.
         /// </summary>
-        public TimeSpan? Duration { get; }
+        public string? Duration { get; }
 
         /// <summary>
         /// Флаг, true - задача повторяемая, false - задача не повторяемая.
@@ -121,7 +121,7 @@
             int priority,
             DateTime? startDateTime,
             DateTime? endDateTime,
-            TimeSpan? duration,
+            string? duration,
             bool isRepit,
             TimeSpan? repitTime,
             bool isRepitFromStart,

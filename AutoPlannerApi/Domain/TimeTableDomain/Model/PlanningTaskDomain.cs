@@ -34,7 +34,7 @@
         /// <summary>
         /// Длительность задачи, может быть null.
         /// </summary>
-        public TimeSpan? Duration { get; }
+        public string? Duration { get; }
 
         /// <summary>
         /// Номер задачи из обшего множества повторяемой задачи.
@@ -109,7 +109,7 @@
             int priority,
             DateTime? startDateTime,
             DateTime? endDateTime,
-            TimeSpan? duration,
+            string? duration,
             int countFrom,
             bool isComplete,
             DateTime? completeDateTime,
