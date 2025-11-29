@@ -176,6 +176,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                 }
                 else {
                     Console.WriteLine($"!1!!!{taskGet.Duration}");
+                    
                     tasks.Add(new MyTask()
                     {
                         Id = taskGet.Id,
@@ -187,7 +188,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         EndDateTime = taskGet.EndDateTime,
                         Duration = TimeSpan.ParseExact(taskGet.Duration, @"d\:hh\:mm\:ss", null),
                         IsRepit = taskGet.IsRepit,
-                        RepitDateTime = taskGet.RepitTime,
+                        RepitDateTime = TimeSpan.ParseExact(taskGet.RepitTime, @"d\:hh\:mm\:ss", null),
                         IsRepitFromStart = taskGet.IsRepitFromStart,
                         CountRepit = taskGet.CountRepit,
                         StartDateTimeRepit = taskGet.StartDateTimeRepit,
@@ -208,7 +209,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                             SecondTask = tasks.First(x => x.Id == taskGet.SecondTaskId),
                             RelationRange = (RelationRangeType)taskGet.RelationRangeId,
                             DateTimeRange = taskGet.DateTimeRange is not null
-                            ? (TimeSpan)taskGet.DateTimeRange
+                            ? TimeSpan.ParseExact(taskGet.DateTimeRange, @"d\:hh\:mm\:ss", null)
                             : TimeSpan.Zero,// вообще не гуд, но мало времени
                         } : null,
                     });
@@ -231,7 +232,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                     EndDateTime = t.EndDateTime,
                     Duration = TimeSpan.ParseExact(t.Duration, @"dd\:hh\:mm\:ss", null),
                     IsRepit = t.IsRepit,
-                    RepitDateTime = t.RepitTime,
+                    RepitDateTime = TimeSpan.ParseExact(t.RepitTime, @"dd\:hh\:mm\:ss", null),
                     IsRepitFromStart = t.IsRepitFromStart,
                     CountRepit = t.CountRepit,
                     StartDateTimeRepit = t.StartDateTimeRepit,
@@ -252,7 +253,7 @@ namespace AutoPlannerApi.Domain.TimeTableDomain.Realization
                         SecondTask = tasks.First(x => x.Id == t.SecondTaskId),
                         RelationRange = (RelationRangeType)t.RelationRangeId,
                         DateTimeRange = t.DateTimeRange is not null
-                            ? (TimeSpan)t.DateTimeRange
+                            ? TimeSpan.ParseExact(t.DateTimeRange, @"dd\:hh\:mm\:ss", null)
                             : TimeSpan.Zero,// вообще не гуд, но мало времени
                     } : null,
                 });

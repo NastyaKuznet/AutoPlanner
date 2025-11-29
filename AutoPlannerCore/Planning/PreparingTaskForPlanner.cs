@@ -44,7 +44,7 @@ namespace AutoPlannerCore.Planning
                     }
                     if (task.StartDateTimeRepit is not null && task.EndDateTimeRepit is not null)
                     {
-                        var a = (double)((task.EndDateTimeRepit - task.StartDateTimeRepit) / (task.Duration + task.RepitDateTime));
+                        var a = ((DateTime)task.EndDateTimeRepit - (TimeSpan)task.Duration - (DateTime)task.StartDateTimeRepit) / ((TimeSpan)task.Duration + (TimeSpan)task.RepitDateTime) + 1;
                         task.CountRepit = (int)Math.Round(a);
                     }
                     if (task.StartDateTimeRepit <= _tableEndDate && task.EndDateTimeRepit >= _tableStartDate)

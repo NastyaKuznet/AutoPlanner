@@ -143,18 +143,34 @@ namespace AutoPlannerApi.Data.TimeTableData.Realization
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync();
+                // Сначала получаем текущее значение is_complete
+                var selectSql = @"SELECT is_complete FROM timetable_items WHERE my_task_id = @taskId";
 
-                var sql = @"
-                    UPDATE timetable_items SET 
-                        is_complete = true, 
-                        complete_date_time = @completeDateTime 
-                    WHERE my_task_id = @taskId";
+                using var selectCommand = new NpgsqlCommand(selectSql, connection);
+                selectCommand.Parameters.AddWithValue("taskId", taskId);
 
-                using var command = new NpgsqlCommand(sql, connection);
-                command.Parameters.AddWithValue("taskId", taskId);
-                command.Parameters.AddWithValue("completeDateTime", DateTime.Now);
+                var currentIsComplete = await selectCommand.ExecuteScalarAsync();
 
-                var rowsAffected = await command.ExecuteNonQueryAsync();
+                if (currentIsComplete == null)
+                {
+                    return new SetCompleteTimeTableItemAnswerStatusDatabase { Status = SetCompleteTimeTableItemAnswerStatusDatabase.TimeTableItemNotExist };
+                }
+                bool isComplete = (bool)currentIsComplete;
+                bool newIsComplete = !isComplete;
+
+                // Обновляем на инвертированное значение
+                var updateSql = @"
+                        UPDATE timetable_items SET 
+                            is_complete = @newIsComplete, 
+                            complete_date_time = @completeDateTime 
+                        WHERE my_task_id = @taskId";
+
+                using var updateCommand = new NpgsqlCommand(updateSql, connection);
+                updateCommand.Parameters.AddWithValue("taskId", taskId);
+                updateCommand.Parameters.AddWithValue("newIsComplete", newIsComplete);
+                updateCommand.Parameters.AddWithValue("completeDateTime", newIsComplete ? DateTime.Now : (object)DBNull.Value);
+
+                var rowsAffected = await updateCommand.ExecuteNonQueryAsync();
 
                 if (rowsAffected == 0)
                 {
@@ -177,18 +193,36 @@ namespace AutoPlannerApi.Data.TimeTableData.Realization
                 using var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync();
 
-                var sql = @"
+                var selectSql = @"SELECT is_complete FROM timetable_items WHERE my_task_id = @taskId AND count_from = @countFrom";
+
+                using var selectCommand = new NpgsqlCommand(selectSql, connection);
+                selectCommand.Parameters.AddWithValue("taskId", taskId);
+                selectCommand.Parameters.AddWithValue("countFrom", countFrom);
+
+                var currentIsComplete = await selectCommand.ExecuteScalarAsync();
+
+                if (currentIsComplete == null)
+                {
+                    return new SetCompleteForRepitAnswerStatusDatabase { Status = SetCompleteForRepitAnswerStatusDatabase.ItemNotExist };
+                }
+
+                bool isComplete = (bool)currentIsComplete;
+                bool newIsComplete = !isComplete;
+
+                // Обновляем на инвертированное значение
+                var updateSql = @"
                     UPDATE timetable_items SET 
-                        is_complete = true, 
+                        is_complete = @newIsComplete, 
                         complete_date_time = @completeDateTime 
                     WHERE my_task_id = @taskId AND count_from = @countFrom";
 
-                using var command = new NpgsqlCommand(sql, connection);
-                command.Parameters.AddWithValue("taskId", taskId);
-                command.Parameters.AddWithValue("completeDateTime", DateTime.Now);
-                command.Parameters.AddWithValue("countFrom", countFrom);
+                using var updateCommand = new NpgsqlCommand(updateSql, connection);
+                updateCommand.Parameters.AddWithValue("taskId", taskId);
+                updateCommand.Parameters.AddWithValue("countFrom", countFrom);
+                updateCommand.Parameters.AddWithValue("newIsComplete", newIsComplete);
+                updateCommand.Parameters.AddWithValue("completeDateTime", newIsComplete ? DateTime.Now : (object)DBNull.Value);
 
-                var rowsAffected = await command.ExecuteNonQueryAsync();
+                var rowsAffected = await updateCommand.ExecuteNonQueryAsync();
 
                 if (rowsAffected == 0)
                 {

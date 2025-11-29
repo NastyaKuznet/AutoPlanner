@@ -30,6 +30,8 @@ namespace AutoPlannerCore.Planning
                     startDateTime = (DateTime)(task.StartDateTimeRepit + (task.RepitDateTime + (task.EndDateTime - task.StartDateTime)) * count);
                 }
                 endDateTime = (DateTime)(startDateTime + (task.EndDateTime - task.StartDateTime));
+                Console.WriteLine($"count{count}, start {startDateTime.ToString()}, end {endDateTime.ToString()}");
+                Console.WriteLine($"final count{task.CountRepit}, final end {task.EndDateTimeRepit.ToString()}");
                 var repitTask = new PlanningTask()
                 {
                     MyTaskId = task.Id,

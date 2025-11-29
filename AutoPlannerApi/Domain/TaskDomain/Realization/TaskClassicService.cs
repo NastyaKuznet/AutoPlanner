@@ -194,6 +194,12 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
             var userTasksDomain = new List<TaskGetDomain>();
             foreach (var task in tasksAnswer.Tasks)
             {
+                var repitTime = task.RepitTime is not null ?
+                    $"{task.RepitTime.Value.Days:D2}:{task.RepitTime.Value.Hours:D2}:{task.RepitTime.Value.Minutes:D2}:{task.RepitTime.Value.Seconds:D2}"
+                    : null;
+                var dateTimeRange = task.DateTimeRange is not null ?
+                    $"{task.DateTimeRange.Value.Days:D2}:{task.DateTimeRange.Value.Hours:D2}:{task.DateTimeRange.Value.Minutes:D2}:{task.DateTimeRange.Value.Seconds:D2}"
+                    : null;
                 userTasksDomain.Add(new TaskGetDomain(
                     task.Id,
                     task.UserId,
@@ -205,7 +211,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.EndDateTime,
                     $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.IsRepit,
-                    task.RepitTime,
+                    repitTime,
                     task.IsRepitFromStart,
                     task.CountRepit,
                     task.StartDateTimeRepit,
@@ -217,7 +223,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.TimePositionRegardingTaskId,
                     task.SecondTaskId,
                     task.RelationRangeId,
-                    task.DateTimeRange,
+                    dateTimeRange,
                     task.IsComplete,
                     task.CompleteDateTime));
             }
@@ -232,7 +238,12 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
         public async Task<TaskGetDomain> GetById(int taskId)
         {
             var task = await _taskDatabaseRepository.GetById(taskId);
-            
+            var repitTime = task.RepitTime is not null ?
+                    $"{task.RepitTime.Value.Days:D2}:{task.RepitTime.Value.Hours:D2}:{task.RepitTime.Value.Minutes:D2}:{task.RepitTime.Value.Seconds:D2}"
+                    : null;
+            var dateTimeRange = task.DateTimeRange is not null ?
+                $"{task.DateTimeRange.Value.Days:D2}:{task.DateTimeRange.Value.Hours:D2}:{task.DateTimeRange.Value.Minutes:D2}:{task.DateTimeRange.Value.Seconds:D2}"
+                : null;
             return new TaskGetDomain(
                     task.Id,
                     task.UserId,
@@ -244,7 +255,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.EndDateTime,
                     $"{task.Duration.Value.Days:D2}:{task.Duration.Value.Hours:D2}:{task.Duration.Value.Minutes:D2}:{task.Duration.Value.Seconds:D2}",
                     task.IsRepit,
-                    task.RepitTime,
+                    repitTime,
                     task.IsRepitFromStart,
                     task.CountRepit,
                     task.StartDateTimeRepit,
@@ -256,7 +267,7 @@ namespace AutoPlannerApi.Domain.TaskDomain.Realization
                     task.TimePositionRegardingTaskId,
                     task.SecondTaskId,
                     task.RelationRangeId,
-                    task.DateTimeRange,
+                    dateTimeRange,
                     task.IsComplete,
                     task.CompleteDateTime);
         }

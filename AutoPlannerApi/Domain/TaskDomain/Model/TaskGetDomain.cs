@@ -36,7 +36,7 @@
         /// <summary>
         /// Дата и время через которое задача должна повториться. 
         /// </summary>
-        public TimeSpan? RepitTime { get; }
+        public string? RepitTime { get; }
 
         /// <summary>
         /// Флаг, true - отсчитывать периодичность задачи от старта задачи, false - отсчитывать периодичность задачи от конца задачи.
@@ -100,7 +100,7 @@
         /// <summary>
         /// Диапазон времени между задачами.
         /// </summary>
-        public TimeSpan? DateTimeRange { get; }
+        public string? DateTimeRange { get; }
 
         /// <summary>
         /// Флаг, true - если задача выполнена, false - если задача не выполнена.
@@ -123,7 +123,7 @@
             DateTime? endDateTime,
             string? duration,
             bool isRepit,
-            TimeSpan? repitTime,
+            string? repitTime,
             bool isRepitFromStart,
             int countRepit,
             DateTime? startDateTimeRepit,
@@ -135,7 +135,7 @@
             int timePositionRegardingTaskId,
             int secondTaskId,
             int relationRangeId,
-            TimeSpan? dateTimeRange,
+            string? dateTimeRange,
             bool isComplete,
             DateTime? completeDateTime)
         {

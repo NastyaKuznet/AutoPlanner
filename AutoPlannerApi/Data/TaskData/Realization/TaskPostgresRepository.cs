@@ -387,18 +387,35 @@ namespace AutoPlannerApi.Data.TaskData.Realization
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync();
+                // Сначала получаем текущее значение is_complete
+                var selectSql = @"SELECT is_complete FROM tasks WHERE id = @id";
 
-                var sql = @"
+                using var selectCommand = new NpgsqlCommand(selectSql, connection);
+                selectCommand.Parameters.AddWithValue("id", taskId);
+
+                var currentIsComplete = await selectCommand.ExecuteScalarAsync();
+
+                if (currentIsComplete == null)
+                {
+                    return new SetCompleteAnswerStatusDatabase { Status = SetCompleteAnswerStatusDatabase.TaskNotExist };
+                }
+
+                bool isComplete = (bool)currentIsComplete;
+                bool newIsComplete = !isComplete;
+
+                // Обновляем на инвертированное значение
+                var updateSql = @"
                     UPDATE tasks SET 
-                        is_complete = true, 
+                        is_complete = @newIsComplete, 
                         complete_date_time = @completeDateTime 
                     WHERE id = @id";
 
-                using var command = new NpgsqlCommand(sql, connection);
-                command.Parameters.AddWithValue("id", taskId);
-                command.Parameters.AddWithValue("completeDateTime", DateTime.Now);
+                using var updateCommand = new NpgsqlCommand(updateSql, connection);
+                updateCommand.Parameters.AddWithValue("id", taskId);
+                updateCommand.Parameters.AddWithValue("newIsComplete", newIsComplete);
+                updateCommand.Parameters.AddWithValue("completeDateTime", newIsComplete ? DateTime.Now : (object)DBNull.Value);
 
-                var rowsAffected = await command.ExecuteNonQueryAsync();
+                var rowsAffected = await updateCommand.ExecuteNonQueryAsync();
 
                 if (rowsAffected == 0)
                 {
